@@ -3,16 +3,16 @@ package gocuke
 import "testing"
 
 func TestRun(t *testing.T) {
-	r := NewRunner(t, func(t *testing.T) Suite {
-		return &suite{}
+	Run(t, Options{}, func(t *testing.T, ctx *ScenarioContext) {
+		s := &suite{}
+		ctx.Step("this", s.this)
+		ctx.Step(`do (\d+)`, s.doSomething)
+		ctx.Step("pass", s.pass)
 	})
-	s := &suite{}
-	r.Step("pass", s.pass)
-	r.Run()
 }
 
 type suite struct{}
 
-func (s *suite) pass() {
-
-}
+func (s *suite) this()             {}
+func (s *suite) doSomething(x int) {}
+func (s *suite) pass()             {}

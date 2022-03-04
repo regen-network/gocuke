@@ -10,66 +10,24 @@ import (
 	"path/filepath"
 	"reflect"
 	"regexp"
+	"strconv"
 	"testing"
 )
 
-type Runner struct {
-	topLevelT *testing.T
-	suiteType reflect.Type
-	paths     []string
-	parallel  bool
-	incr      *messages.Incrementing
-	newSuite  func(*testing.T) Suite
-	stepDefs  []*stepDef
+type runner struct {
+	opts          Options
+	setupScenario func(*testing.T, *ScenarioContext)
+	topLevelT     *testing.T
+	incr          *messages.Incrementing
 }
 
-type Suite interface{}
-
-func NewRunner(t *testing.T, newSuite func(*testing.T) Suite) *Runner {
-	s := newSuite(t)
-	return &Runner{
-		topLevelT: t,
-		suiteType: reflect.TypeOf(s),
-		newSuite:  newSuite,
-		incr:      &messages.Incrementing{},
-	}
+type Options struct {
+	Paths    []string
+	Parallel bool
 }
 
-func (r *Runner) AddPath(path string) {
-	r.paths = append(r.paths, path)
-}
-
-func (r *Runner) Step(step string, method interface{}) {
-	exp, err := regexp.Compile(step)
-	assert.NilError(r.topLevelT, err)
-
-	val := reflect.ValueOf(method)
-	typ := val.Type()
-	if typ.Kind() != reflect.Func {
-		r.topLevelT.Fatalf("expected step method, got %+v", method)
-	}
-
-	if typ.NumIn() < 1 {
-		r.topLevelT.Fatalf("expected at least 1 parameter for method %+v", method)
-	}
-
-	in0 := typ.In(0)
-	if in0 != r.suiteType {
-		r.topLevelT.Fatalf("expected at first parameter of method %v to be of type %v", method, in0)
-	}
-
-	if typ.NumOut() != 0 {
-		r.topLevelT.Fatalf("expected 0 out parameters for method %+v", method)
-	}
-
-	r.stepDefs = append(r.stepDefs, &stepDef{
-		exp: exp,
-		f:   val,
-	})
-}
-
-func (r *Runner) Run() {
-	paths := r.paths
+func (r *runner) run() {
+	paths := r.opts.Paths
 	if len(paths) == 0 {
 		paths = []string{"features/*.feature"}
 	}
@@ -80,7 +38,7 @@ func (r *Runner) Run() {
 
 		for _, file := range files {
 			r.topLevelT.Run(file, func(t *testing.T) {
-				if r.parallel {
+				if r.opts.Parallel {
 					t.Parallel()
 				}
 
@@ -101,7 +59,7 @@ func (r *Runner) Run() {
 	}
 }
 
-func (r *Runner) runDoc(t *testing.T, doc *messages.GherkinDocument) {
+func (r *runner) runDoc(t *testing.T, doc *messages.GherkinDocument) {
 	t.Logf("feature %s", doc.Feature.Name)
 
 	pickles := gherkin.Pickles(*doc, doc.Uri, r.incr.NewId)
@@ -109,48 +67,58 @@ func (r *Runner) runDoc(t *testing.T, doc *messages.GherkinDocument) {
 		t.Run(pickle.Name, func(t *testing.T) {
 			t.Logf("pickle %s", pickle.Name)
 
-			if r.parallel {
+			if r.opts.Parallel {
 				t.Parallel()
 			}
 
-			s := r.newSuite(t)
-			if s, ok := s.(BeforeScenario); ok {
-				s.BeforeScenario()
+			scenarioCtx := &ScenarioContext{
+				stepDefs: nil,
+				t:        t,
 			}
 
-			if s, ok := s.(CleanupScenario); ok {
-				defer s.CleanupScenario()
-			}
+			r.setupScenario(t, scenarioCtx)
 
 			for _, step := range pickle.Steps {
-				if s, ok := s.(SetupStep); ok {
-					s.SetupStep()
-				}
-
-				r.runStep(t, s, step)
-
-				if s, ok := s.(CleanupStep); ok {
-					s.CleanupStep()
-				}
+				r.runStep(t, scenarioCtx, step)
 			}
 		})
 	}
 }
 
-func (r *Runner) runStep(t *testing.T, s Suite, step *messages.PickleStep) {
+func (r *runner) runStep(t *testing.T, ctx *ScenarioContext, step *messages.PickleStep) {
 	t.Logf("step %s %+v", step.Text, step.Argument)
 
 	// find step
-	for _, def := range r.stepDefs {
+	for _, def := range ctx.stepDefs {
 		matches := def.exp.FindSubmatch([]byte(step.Text))
 		if len(matches) == 0 {
 			continue
 		}
 
-		values := []reflect.Value{reflect.ValueOf(s)}
+		matches = matches[1:]
+		n := len(matches)
+		typ := def.f.Type()
+		if n != typ.NumIn() {
+			t.Fatalf("expected %d in parameters for function %+v", n, def.f)
+		}
 
-		for _, _ = range matches[1:] {
-			panic("TODO")
+		values := make([]reflect.Value, n)
+		for i, match := range matches {
+			kind := typ.In(i).Kind()
+			switch kind {
+			case reflect.Int:
+				x, err := strconv.Atoi(string(match))
+				assert.NilError(t, err)
+				values[i] = reflect.ValueOf(x)
+			case reflect.Uint:
+				x, err := strconv.Atoi(string(match))
+				assert.NilError(t, err)
+				values[i] = reflect.ValueOf(uint(x))
+			case reflect.String:
+				values[i] = reflect.ValueOf(string(match))
+			default:
+				t.Fatalf("unexpected parameter kind %s", kind)
+			}
 		}
 
 		def.f.Call(values)
@@ -160,29 +128,42 @@ func (r *Runner) runStep(t *testing.T, s Suite, step *messages.PickleStep) {
 	t.Fatalf("can't find step definition: %s", step.Text)
 }
 
-type SetupStep interface {
-	SetupStep()
-}
-
-type CleanupStep interface {
-	CleanupStep()
-}
-
-type BeforeScenario interface {
-	BeforeScenario()
-}
-
-type CleanupScenario interface {
-	CleanupScenario()
-}
-
 type stepDef struct {
 	exp *regexp.Regexp
 	f   reflect.Value
 }
 
-type ScenarioContext struct{}
+func (r *ScenarioContext) Step(step string, fn interface{}) {
+	exp, err := regexp.Compile(step)
+	assert.NilError(r.t, err)
 
-func Run(t *testing.T, runScenario func(*testing.T, *ScenarioContext)) {
+	val := reflect.ValueOf(fn)
+	typ := val.Type()
+	if typ.Kind() != reflect.Func {
+		r.t.Fatalf("expected step fn, got %+v", fn)
+	}
 
+	if typ.NumOut() != 0 {
+		r.t.Fatalf("expected 0 out parameters for fn %+v", fn)
+	}
+
+	r.stepDefs = append(r.stepDefs, &stepDef{
+		exp: exp,
+		f:   val,
+	})
+}
+
+type ScenarioContext struct {
+	stepDefs []*stepDef
+	t        *testing.T
+}
+
+func Run(t *testing.T, opts Options, setupScenario func(t *testing.T, ctx *ScenarioContext)) {
+	r := &runner{
+		opts:          opts,
+		setupScenario: setupScenario,
+		topLevelT:     t,
+		incr:          &messages.Incrementing{},
+	}
+	r.run()
 }
