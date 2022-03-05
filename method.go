@@ -2,7 +2,7 @@ package gocuke
 
 import "reflect"
 
-func (r *ScenarioContext) StepMethods(suite interface{}) {
+func (r *ScenarioContext) RegisterStepMethods(suite interface{}) {
 	typ := reflect.TypeOf(suite)
 	for _, step := range r.pickle.Steps {
 		sig := guessMethodSig(step.Text)

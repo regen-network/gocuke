@@ -4,15 +4,13 @@ import "testing"
 
 func TestRun(t *testing.T) {
 	Run(t, Options{}, func(t *testing.T, ctx *ScenarioContext) {
-		ctx.StepMethods(&suite{})
-		//ctx.Step("I have a data table", s.iHaveADataTable)
-		//ctx.Step(`some doc string`, s.someDocString)
-		//ctx.Step(`add (\d+)`, s.add)
-		//ctx.Step("pass", s.pass)
+		ctx.RegisterStepMethods(&suite{t: t})
 	})
 }
 
-type suite struct{}
+type suite struct {
+	t *testing.T
+}
 
 func (s *suite) IHaveADataTable(dt DataTable) {}
 func (s *suite) SomeDocString(ds DocString)   {}
