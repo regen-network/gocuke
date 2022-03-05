@@ -1,13 +1,15 @@
 package gocuke
 
 import (
+	"fmt"
+	"github.com/cucumber/messages-go/v16"
 	"regexp"
 	"strings"
 	"unicode"
 )
 
-func guessMethodSig(text string) methodSig {
-	parts := strings.Split(strings.TrimSpace(text), " ")
+func guessMethodSig(step *messages.PickleStep) methodSig {
+	parts := strings.Split(strings.TrimSpace(step.Text), " ")
 	var (
 		nameParts     []string
 		paramTypes    []string
@@ -68,6 +70,14 @@ func guessMethodSig(text string) methodSig {
 
 	regex := regexp.MustCompile(strings.Join(regexParts, ` `))
 
+	if step.Argument != nil {
+		if step.Argument.DataTable != nil {
+			paramTypes = append(paramTypes, "gocuke.DataTable")
+		} else if step.Argument.DocString != nil {
+			paramTypes = append(paramTypes, "gocuke.DocString")
+		}
+	}
+
 	if len(nameParts) == 0 {
 		return methodSig{name: "unknown", paramTypes: paramTypes, regex: regex}
 	}
@@ -97,14 +107,18 @@ func toFirstUpperIdentifier(str string) string {
 	var res []rune
 	isFirst := true
 	for _, r := range runes {
-		if !(unicode.IsLetter(r) || unicode.IsNumber(r)) {
-			continue
-		}
-
 		if isFirst {
+			if !(unicode.IsLetter(r) || unicode.IsNumber(r)) {
+				continue
+			}
+
 			res = append(res, unicode.ToUpper(r))
 			isFirst = false
 		} else {
+			if !(unicode.IsLetter(r) || unicode.IsNumber(r)) {
+				continue
+			}
+
 			res = append(res, unicode.ToLower(r))
 		}
 	}
@@ -117,10 +131,9 @@ type methodSig struct {
 	regex      *regexp.Regexp
 }
 
+func (m methodSig) suggestion() string {
+	return fmt.Sprintf("%s(%s)", m.name, strings.Join(m.paramTypes, ", "))
+}
+
 var decRegex = regexp.MustCompile(`\d+(\.\d+)`)
 var intRegex = regexp.MustCompile(`\d+`)
-
-//func formatMethodStub(step *messages.PickleStep)  {
-//	sig := guessMethodSig(step.Text)
-//	TODO
-//}

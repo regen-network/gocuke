@@ -4,7 +4,7 @@ import "testing"
 
 func TestRun(t *testing.T) {
 	Run(t, Options{}, func(t *testing.T, ctx *ScenarioContext) {
-		ctx.RegisterStepMethods(&suite{t: t})
+		ctx.StepSuite(&suite{t: t})
 	})
 }
 

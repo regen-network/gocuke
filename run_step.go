@@ -66,5 +66,6 @@ func (r *runner) runStep(t *testing.T, ctx *ScenarioContext, step *messages.Pick
 		return
 	}
 
-	t.Fatalf("can't find step definition: %s", step.Text)
+	sig := guessMethodSig(step)
+	t.Errorf("can't find step definition for: %s\nsuggested method: %s", step.Text, sig.suggestion())
 }
