@@ -1,6 +1,12 @@
 Feature: DataTables
 
   Scenario: simple
-    Given this
-    When do 5
+    Given I have a data table
+    | 1 |
+    | 3 |
+    | 7 |
+    When some doc string:
+    """markdown
+    # Hello
+    """
     Then pass
