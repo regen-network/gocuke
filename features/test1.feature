@@ -9,4 +9,8 @@ Feature: DataTables
     """markdown
     # Hello
     """
+    And add 5
+    ```go
+    x := 5
+    ```
     Then pass

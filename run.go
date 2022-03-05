@@ -8,6 +8,7 @@ import (
 	"gotest.tools/v3/assert"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -34,17 +35,24 @@ type runner struct {
 }
 
 type Options struct {
-	Paths    []string
+	// Path is a comma-separated list of file paths, each in the format expected
+	// by filepath.Glob
+	Path string
+
+	// Parallel indicates that the tests will run in parallel
 	Parallel bool
 }
 
 func (r *runner) run() {
-	paths := r.opts.Paths
-	if len(paths) == 0 {
-		paths = []string{"features/*.feature"}
+	path := r.opts.Path
+	if path == "" {
+		path = "features/*.feature"
 	}
 
+	paths := strings.Split(path, ",")
+
 	for _, path := range paths {
+
 		files, err := filepath.Glob(path)
 		assert.NilError(r.topLevelT, err)
 
