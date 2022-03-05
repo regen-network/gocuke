@@ -5,11 +5,10 @@ import (
 	"github.com/cucumber/messages-go/v16"
 	"math/big"
 	"reflect"
-	"testing"
 )
 
 type DataTable struct {
-	t     *testing.T
+	t     TestingT
 	table *messages.PickleTable
 }
 
@@ -43,7 +42,7 @@ func (d DataTable) Cell(row, col int) *Cell {
 }
 
 type Cell struct {
-	t     *testing.T
+	t     TestingT
 	value string
 }
 
@@ -55,16 +54,34 @@ func (c Cell) Int64() int64 {
 	return toInt64(c.t, c.value)
 }
 
-func (c Cell) Float64() float64 {
-	return toFloat64(c.t, c.value)
-}
-
 func (c Cell) BigInt() *big.Int {
 	return toBigInt(c.t, c.value)
 }
 
 func (c Cell) Decimal() *apd.Decimal {
 	return toDecimal(c.t, c.value)
+}
+
+func (d DataTable) HeaderTable() *HeaderTable {
+	headers := map[string]int{}
+	for i := 0; i < d.NumCols(); i++ {
+		headers[d.Cell(0, i).String()] = i
+	}
+
+	return &HeaderTable{headers: headers, DataTable: d}
+}
+
+type HeaderTable struct {
+	DataTable
+	headers map[string]int
+}
+
+func (h *HeaderTable) Get(row int, col string) *Cell {
+	return h.DataTable.Cell(row+1, h.headers[col])
+}
+
+func (h *HeaderTable) NumRows() int {
+	return h.DataTable.NumRows() - 1
 }
 
 var dataTableType = reflect.TypeOf(DataTable{})

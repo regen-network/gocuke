@@ -3,6 +3,7 @@ package gocuke
 import (
 	"fmt"
 	"github.com/cucumber/messages-go/v16"
+	"reflect"
 	"regexp"
 	"strings"
 	"unicode"
@@ -53,13 +54,13 @@ func guessMethodSig(step *messages.PickleStep) methodSig {
 		default:
 			if decRegex.MatchString(part) {
 				paramTypes = append(paramTypes, "float64")
-				regexParts = append(regexParts, "("+decRegex.String()+")")
+				regexParts = append(regexParts, `(\d+\.\d+)`)
 				continue
 			}
 
 			if intRegex.MatchString(part) {
 				paramTypes = append(paramTypes, "int64")
-				regexParts = append(regexParts, "("+intRegex.String()+")")
+				regexParts = append(regexParts, `(\d+)`)
 				continue
 			}
 		}
@@ -131,9 +132,24 @@ type methodSig struct {
 	regex      *regexp.Regexp
 }
 
-func (m methodSig) suggestion() string {
-	return fmt.Sprintf("%s(%s)", m.name, strings.Join(m.paramTypes, ", "))
+func (m methodSig) suggestion(suiteType reflect.Type) string {
+	paramNames := make([]string, len(m.paramTypes))
+	for i, paramType := range m.paramTypes {
+		paramNames[i] = fmt.Sprintf("%s %s", string(rune('a'+i)), paramType)
+	}
+
+	var suiteTypeName string
+	if suiteType.Kind() == reflect.Pointer {
+		suiteTypeName = "*" + suiteType.Elem().Name()
+	} else {
+		suiteTypeName = suiteType.Name()
+	}
+
+	return fmt.Sprintf(`func (s %s) %s(%s) {
+    panic("TODO")
+}`,
+		suiteTypeName, m.name, strings.Join(paramNames, ", "))
 }
 
-var decRegex = regexp.MustCompile(`\d+(\.\d+)`)
-var intRegex = regexp.MustCompile(`\d+`)
+var decRegex = regexp.MustCompile(`^\d+\.\d+$`)
+var intRegex = regexp.MustCompile(`^\d+$`)

@@ -1,18 +1,21 @@
-package gocuke
+package gocuke_test
 
-import "testing"
+import (
+	"gocuke"
+	"testing"
+)
 
 func TestRun(t *testing.T) {
-	Run(t, Options{}, func(t *testing.T, ctx *ScenarioContext) {
-		ctx.StepSuite(&suite{t: t})
-	})
+	gocuke.NewRunner(t, func(t gocuke.TestingT) gocuke.Suite {
+		return &suite{t}
+	}).Run()
 }
 
 type suite struct {
-	t *testing.T
+	gocuke.TestingT
 }
 
-func (s *suite) IHaveADataTable(dt DataTable) {}
-func (s *suite) SomeDocString(ds DocString)   {}
-func (s *suite) Add(x int64, ds DocString)    {}
-func (s *suite) Pass()                        {}
+func (s *suite) IHaveADataTable(dt gocuke.DataTable) {}
+func (s *suite) SomeDocString(ds gocuke.DocString)   {}
+func (s *suite) Add(x int64, ds gocuke.DocString)    {}
+func (s *suite) Pass()                               {}
