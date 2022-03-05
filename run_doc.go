@@ -21,6 +21,7 @@ func (r *runner) runDoc(t *testing.T, doc *messages.GherkinDocument) {
 			scenarioCtx := &ScenarioContext{
 				stepDefs: nil,
 				t:        t,
+				pickle:   pickle,
 			}
 
 			r.setupScenario(t, scenarioCtx)

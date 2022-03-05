@@ -13,6 +13,7 @@ import (
 )
 
 type ScenarioContext struct {
+	pickle   *messages.Pickle
 	stepDefs []*stepDef
 	t        *testing.T
 }

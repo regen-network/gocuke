@@ -2,9 +2,7 @@ package gocuke
 
 import (
 	"github.com/cucumber/messages-go/v16"
-	"gotest.tools/v3/assert"
 	"reflect"
-	"regexp"
 	"testing"
 )
 
@@ -69,29 +67,4 @@ func (r *runner) runStep(t *testing.T, ctx *ScenarioContext, step *messages.Pick
 	}
 
 	t.Fatalf("can't find step definition: %s", step.Text)
-}
-
-type stepDef struct {
-	exp *regexp.Regexp
-	f   reflect.Value
-}
-
-func (r *ScenarioContext) Step(step string, fn interface{}) {
-	exp, err := regexp.Compile(step)
-	assert.NilError(r.t, err)
-
-	val := reflect.ValueOf(fn)
-	typ := val.Type()
-	if typ.Kind() != reflect.Func {
-		r.t.Fatalf("expected step fn, got %+v", fn)
-	}
-
-	if typ.NumOut() != 0 {
-		r.t.Fatalf("expected 0 out parameters for fn %+v", fn)
-	}
-
-	r.stepDefs = append(r.stepDefs, &stepDef{
-		exp: exp,
-		f:   val,
-	})
 }
