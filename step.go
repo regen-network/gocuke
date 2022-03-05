@@ -16,13 +16,17 @@ func (r *ScenarioContext) Step(step string, fn interface{}) {
 	assert.NilError(r.t, err)
 
 	val := reflect.ValueOf(fn)
+	r.addStep(exp, val)
+}
+
+func (r *ScenarioContext) addStep(exp *regexp.Regexp, val reflect.Value) {
 	typ := val.Type()
 	if typ.Kind() != reflect.Func {
-		r.t.Fatalf("expected step fn, got %+v", fn)
+		r.t.Fatalf("expected step fn, got %+v", val)
 	}
 
 	if typ.NumOut() != 0 {
-		r.t.Fatalf("expected 0 out parameters for fn %+v", fn)
+		r.t.Fatalf("expected 0 out parameters for fn %+v", val)
 	}
 
 	r.stepDefs = append(r.stepDefs, &stepDef{

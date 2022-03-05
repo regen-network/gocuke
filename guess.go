@@ -7,7 +7,7 @@ import (
 )
 
 func guessMethodSig(text string) methodSig {
-	parts := strings.Split(text, " ")
+	parts := strings.Split(strings.TrimSpace(text), " ")
 	var (
 		nameParts     []string
 		paramTypes    []string
@@ -51,30 +51,37 @@ func guessMethodSig(text string) methodSig {
 		default:
 			if decRegex.MatchString(part) {
 				paramTypes = append(paramTypes, "float64")
-				regexParts = append(regexParts, decRegex.String())
+				regexParts = append(regexParts, "("+decRegex.String()+")")
 				continue
 			}
 
 			if intRegex.MatchString(part) {
 				paramTypes = append(paramTypes, "int64")
-				regexParts = append(regexParts, intRegex.String())
+				regexParts = append(regexParts, "("+intRegex.String()+")")
 				continue
 			}
 		}
 
 		nameParts = append(nameParts, part)
+		regexParts = append(regexParts, part)
 	}
+
+	regex := regexp.MustCompile(strings.Join(regexParts, ` `))
 
 	if len(nameParts) == 0 {
-		return methodSig{name: "unknown", paramTypes: paramTypes}
+		return methodSig{name: "unknown", paramTypes: paramTypes, regex: regex}
 	}
 
-	name := strings.ToLower(nameParts[0])
-	for i := 1; i < len(nameParts); i++ {
-		name = name + toFirstUpper(nameParts[i])
+	var name string
+	for i := 0; i < len(nameParts); i++ {
+		n := toFirstUpperIdentifier(nameParts[i])
+		if n == "" {
+			continue
+		}
+		name = name + n
 	}
 
-	return methodSig{name: name, paramTypes: paramTypes}
+	return methodSig{name: name, paramTypes: paramTypes, regex: regex}
 }
 
 func firstChar(x string) byte {
@@ -85,18 +92,23 @@ func lastChar(x string) byte {
 	return x[len(x)-1]
 }
 
-func toFirstUpper(str string) string {
+func toFirstUpperIdentifier(str string) string {
 	runes := []rune(str)
+	var res []rune
 	isFirst := true
-	for i, r := range runes {
+	for _, r := range runes {
+		if !(unicode.IsLetter(r) || unicode.IsNumber(r)) {
+			continue
+		}
+
 		if isFirst {
-			runes[i] = unicode.ToUpper(r)
+			res = append(res, unicode.ToUpper(r))
 			isFirst = false
 		} else {
-			runes[i] = unicode.ToLower(r)
+			res = append(res, unicode.ToLower(r))
 		}
 	}
-	return string(runes)
+	return string(res)
 }
 
 type methodSig struct {
