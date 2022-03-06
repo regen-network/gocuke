@@ -35,7 +35,7 @@ func (r *Runner) Run() {
 					t.Parallel()
 				}
 
-				r.runDoc(t, doc)
+				(newDocRunner(r, doc)).runDoc(t)
 			})
 		}
 	}
