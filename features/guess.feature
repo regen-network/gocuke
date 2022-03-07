@@ -56,10 +56,10 @@ Feature: guess the method names, parameter types and regexes of step definitions
       | red |
 
 
-  Scenario: many parameters
+  Scenario: many parameters and negative values
     Given the step
     """
-    I have 10 "green" cucumbers which weigh 1.3 kilos.
+    I have -10 "violet" cucumbers which weigh -1.3 kilos.
     """
     When we guess the step definition
     Then we get the method signature
@@ -68,4 +68,15 @@ Feature: guess the method names, parameter types and regexes of step definitions
     """
     When we match the step
     Then we get the values
-      | 10 | green | 1.3 |
+      | -10 | violet | -1.3 |
+
+  Scenario: punctuation and regex special characters
+    Given the step
+    """
+    this: x + y .* (foo)
+    """
+    When we guess the step definition
+    Then we get the method signature
+    """
+    ThisXYFoo()
+    """

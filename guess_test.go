@@ -7,18 +7,9 @@ import (
 )
 
 func TestGuessMethodSig(t *testing.T) {
-	t.Log(guessMethodSigWithText("I have one"))
-	t.Log(guessMethodSigWithText("I have 5"))
-	t.Log(guessMethodSigWithText(`I have 5 "foo" and 3 "bar"`))
-	t.Log(guessMethodSigWithText(`when I convert it to an int64"`))
-
 	NewRunner(t, func(t TestingT) Suite {
 		return &guessSuite{TestingT: t}
 	}).WithPath("features/guess.feature").Run()
-}
-
-func guessMethodSigWithText(text string) methodSig {
-	return guessMethodSig(&messages.PickleStep{Text: text})
 }
 
 type guessSuite struct {

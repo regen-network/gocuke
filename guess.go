@@ -53,19 +53,19 @@ func guessMethodSig(step *messages.PickleStep) methodSig {
 		default:
 			if decRegex.MatchString(part) {
 				paramTypes = append(paramTypes, "*apd.Decimal")
-				regexParts = append(regexParts, `(\d+\.\d+)`)
+				regexParts = append(regexParts, `(-?\d+\.\d+)`)
 				continue
 			}
 
 			if intRegex.MatchString(part) {
 				paramTypes = append(paramTypes, "int64")
-				regexParts = append(regexParts, `(\d+)`)
+				regexParts = append(regexParts, `(-?\d+)`)
 				continue
 			}
 		}
 
 		nameParts = append(nameParts, part)
-		regexParts = append(regexParts, part)
+		regexParts = append(regexParts, regexp.QuoteMeta(part))
 	}
 
 	regex := regexp.MustCompile(strings.Join(regexParts, ` `))
@@ -147,5 +147,5 @@ func (m methodSig) suggestion(suiteTypeName string) string {
 		suiteTypeName, m.methodSig())
 }
 
-var decRegex = regexp.MustCompile(`^\d+\.\d+$`)
-var intRegex = regexp.MustCompile(`^\d+$`)
+var decRegex = regexp.MustCompile(`^-?\d+\.\d+$`)
+var intRegex = regexp.MustCompile(`^-?\d+$`)

@@ -36,8 +36,7 @@ var bigIntComparer = cmp.Comparer(func(x, y *big.Int) bool {
 })
 
 func (s *valuesSuite) AnyInt64String(t *rapid.T) {
-	s.orig = rapid.Int64().Draw(t, "orig")
-	s.str = fmt.Sprintf("%d", s.orig)
+	s.AnInt64(rapid.Int64().Draw(t, "orig").(int64))
 }
 
 func (s *valuesSuite) WhenIConvertItToAnInt64() {
@@ -61,9 +60,7 @@ var decGen = rapid.Custom(func(t *rapid.T) *apd.Decimal {
 })
 
 func (s *valuesSuite) AnyDecimalString(t *rapid.T) {
-	x := decGen.Draw(t, "x").(*apd.Decimal)
-	s.orig = x
-	s.str = x.String()
+	s.ADecimal(decGen.Draw(t, "x").(*apd.Decimal))
 }
 
 func (s *valuesSuite) WhenIConvertItToADecimal() {
@@ -86,11 +83,24 @@ var bigIntGen = rapid.Custom(func(t *rapid.T) *big.Int {
 })
 
 func (s *valuesSuite) AnyBigIntegerString(t *rapid.T) {
-	x := bigIntGen.Draw(t, "x").(*big.Int)
-	s.orig = x
-	s.str = x.String()
+	s.ABigInteger(bigIntGen.Draw(t, "x").(*big.Int))
 }
 
 func (s *valuesSuite) WhenIConvertItToABigInteger() {
 	s.parsed = toBigInt(s, s.str)
+}
+
+func (s *valuesSuite) AnInt64(a int64) {
+	s.orig = a
+	s.str = fmt.Sprintf("%d", a)
+}
+
+func (s *valuesSuite) ADecimal(a *apd.Decimal) {
+	s.orig = a
+	s.str = a.String()
+}
+
+func (s *valuesSuite) ABigInteger(a *big.Int) {
+	s.orig = a
+	s.str = a.String()
 }

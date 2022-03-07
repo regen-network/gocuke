@@ -8,6 +8,10 @@ import (
 
 func (r *Runner) runStep(t TestingT, step *messages.PickleStep, def *stepDef, s Suite) {
 	matches := def.exp.FindSubmatch([]byte(step.Text))
+	if len(matches) == 0 {
+		t.Fatalf("internal error: no matches found when matching %s against %s", def.exp.String(), step.Text)
+	}
+
 	matches = matches[1:]
 	expectedIn := len(matches) + 1
 	typ := def.f.Type()
