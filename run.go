@@ -5,6 +5,7 @@ import (
 	"gotest.tools/v3/assert"
 	"os"
 	"path/filepath"
+	"reflect"
 	"testing"
 )
 
@@ -43,9 +44,16 @@ func (r *Runner) Run() {
 	}
 
 	if len(r.suggestions) != 0 {
+		var suiteTypeName string
+		if r.suiteType.Kind() == reflect.Pointer {
+			suiteTypeName = "*" + r.suiteType.Elem().Name()
+		} else {
+			suiteTypeName = r.suiteType.Name()
+		}
+
 		suggestionText := "Missing step definitions can be fixed with the following methods:\n"
 		for _, sig := range r.suggestions {
-			suggestionText += sig.suggestion(r.suiteType) + "\n\n"
+			suggestionText += sig.suggestion(suiteTypeName) + "\n\n"
 		}
 		r.topLevelT.Logf(suggestionText)
 	}

@@ -1,4 +1,4 @@
-Feature: value conversions
+Feature: convert parameter strings to step definition values
 
   Scenario: int64 values
     Given any int64 string

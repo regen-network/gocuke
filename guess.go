@@ -3,7 +3,6 @@ package gocuke
 import (
 	"fmt"
 	"github.com/cucumber/messages-go/v16"
-	"reflect"
 	"regexp"
 	"strings"
 	"unicode"
@@ -53,7 +52,7 @@ func guessMethodSig(step *messages.PickleStep) methodSig {
 			continue
 		default:
 			if decRegex.MatchString(part) {
-				paramTypes = append(paramTypes, "float64")
+				paramTypes = append(paramTypes, "*apd.Decimal")
 				regexParts = append(regexParts, `(\d+\.\d+)`)
 				continue
 			}
@@ -132,23 +131,20 @@ type methodSig struct {
 	regex      *regexp.Regexp
 }
 
-func (m methodSig) suggestion(suiteType reflect.Type) string {
+func (m methodSig) methodSig() string {
 	paramNames := make([]string, len(m.paramTypes))
 	for i, paramType := range m.paramTypes {
 		paramNames[i] = fmt.Sprintf("%s %s", string(rune('a'+i)), paramType)
 	}
 
-	var suiteTypeName string
-	if suiteType.Kind() == reflect.Pointer {
-		suiteTypeName = "*" + suiteType.Elem().Name()
-	} else {
-		suiteTypeName = suiteType.Name()
-	}
+	return fmt.Sprintf(`%s(%s)`, m.name, strings.Join(paramNames, ", "))
+}
 
-	return fmt.Sprintf(`func (s %s) %s(%s) {
+func (m methodSig) suggestion(suiteTypeName string) string {
+	return fmt.Sprintf(`func (s %s) %s {
     panic("TODO")
 }`,
-		suiteTypeName, m.name, strings.Join(paramNames, ", "))
+		suiteTypeName, m.methodSig())
 }
 
 var decRegex = regexp.MustCompile(`^\d+\.\d+$`)
