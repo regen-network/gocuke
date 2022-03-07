@@ -7,10 +7,7 @@ import (
 )
 
 func (r *docRunner) runScenario(t *testing.T, pickle *messages.Pickle) {
-	for _, id := range pickle.AstNodeIds {
-		t.Logf("ast node: %s", printAstNode(r.astNodeMap[id]))
-	}
-
+	t.Helper()
 	stepDefs := make([]*stepDef, len(pickle.Steps))
 	for i, step := range pickle.Steps {
 		stepDefs[i] = r.findStep(t, step)

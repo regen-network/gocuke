@@ -9,3 +9,8 @@ Feature: value conversions
     Given any decimal string
     When when I convert it to a decimal
     Then I get back the original value
+
+  Scenario: big integer values
+    Given any big integer string
+    When when I convert it to a big integer
+    Then I get back the original value

@@ -41,7 +41,7 @@ func toInt64(t TestingT, value string) int64 {
 func toBigInt(t TestingT, value string) *big.Int {
 	x := &big.Int{}
 	x, ok := x.SetString(value, 10)
-	if ok {
+	if !ok {
 		t.Fatalf("error converting %s to *big.Int", value)
 	}
 	return x

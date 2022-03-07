@@ -9,6 +9,8 @@ import (
 )
 
 func (r *Runner) Run() {
+	r.topLevelT.Helper()
+
 	paths := r.paths
 	if len(paths) == 0 {
 		paths = []string{"features/*.feature"}
@@ -40,13 +42,11 @@ func (r *Runner) Run() {
 		}
 	}
 
-	//defer func() {
 	if len(r.suggestions) != 0 {
-		suggestionText := "Missing definitions can be fixed with the following methods:\n"
+		suggestionText := "Missing step definitions can be fixed with the following methods:\n"
 		for _, sig := range r.suggestions {
 			suggestionText += sig.suggestion(r.suiteType) + "\n\n"
 		}
 		r.topLevelT.Logf(suggestionText)
 	}
-	//}()
 }
