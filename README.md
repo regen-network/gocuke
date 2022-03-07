@@ -25,7 +25,7 @@ This library offers:
 * full support for all of the latest Gherkin features including rules (via
   the latest cucumber/gherkin-go and cucumber/messages-go)
 
-## Usage
+## Quick Start
 
 ### Step 1: Define some Gherkin
 

@@ -9,6 +9,7 @@ import (
 	"testing"
 )
 
+// Run runs the features registered with the runner.
 func (r *Runner) Run() {
 	r.topLevelT.Helper()
 
