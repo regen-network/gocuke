@@ -45,9 +45,7 @@ Feature: simple
       | 10 | 2 | 8 |
 ```
 
-### Step 2: 
-
-Setup the test suite:
+### Step 2: Setup the test suite
 
 In a file simple_test.go:
 
@@ -93,7 +91,7 @@ Copy these definitions into `simple_test.go`.
 Now implement the step definitions in `simple_test.go`, adding the
 variable `cukes int64` to `suite` which tracks state between tests.
 
-NOTE: a new `suite` is constructed for every test case so it is safe
+**NOTE:** a new `suite` is constructed for every test case so it is safe
 to run tests in parallel, which is the default and what is happening
 in this example with each of the test cases in the `Scenario Outline`.
 
