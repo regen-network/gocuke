@@ -34,10 +34,15 @@ In a file `features/simple.feature`:
 ```gherkin
 Feature: simple
 
-Scenario: eat cukes
-  Given I have 5 cukes
-  When I eat 3
-  Then I have 2 left
+  Scenario Outline: eat cukes
+    Given I have <x> cukes
+    When I eat <y>
+    Then I have <z> left
+
+    Examples:
+      | x | y | z |
+      | 5 | 3 | 2 |
+      | 10 | 2 | 8 |
 ```
 
 ### Step 2: 
@@ -65,24 +70,32 @@ type suite struct {
 }
 ```
 
-When running tests you should get these suggestions:
+When you run the tests, they should fail and suggest that you add these
+step definitions:
 ```go
-        func (s *suite) IEat(a int64) {
-            panic("TODO")
-        }
-        
-        func (s *suite) IHaveLeft(a int64) {
-            panic("TODO")
-        }
-        
-        func (s *suite) IHaveCukes(a int64) {
-            panic("TODO")
-        }
+func (s *suite) IEat(a int64) {
+    panic("TODO")
+}
+
+func (s *suite) IHaveLeft(a int64) {
+    panic("TODO")
+}
+
+func (s *suite) IHaveCukes(a int64) {
+    panic("TODO")
+}
 ```
 
-Copy these definitions into `simple_test.go`
+Copy these definitions into `simple_test.go`.
 
 ### Step 3: Implement Step Definitions
+
+Now implement the step definitions in `simple_test.go`, adding the
+variable `cukes int64` to `suite` which tracks state between tests.
+
+NOTE: a new `suite` is constructed for every test case so it is safe
+to run tests in parallel, which is the default and what is happening
+in this example with each of the test cases in the `Scenario Outline`.
 
 ```go
 type suite struct {

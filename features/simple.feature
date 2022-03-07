@@ -1,6 +1,11 @@
 Feature: simple
 
-  Scenario: eat cukes
-    Given I have 5 cukes
-    When I eat 3
-    Then I have 2 left
+  Scenario Outline: eat cukes
+    Given I have <x> cukes
+    When I eat <y>
+    Then I have <z> left
+
+    Examples:
+    | x | y | z |
+    | 5 | 3 | 2 |
+    | 10 | 2 | 8 |
