@@ -1,6 +1,6 @@
 module github.com/aaronc/gocuke
 
-go 1.18
+go 1.17
 
 require (
 	github.com/cockroachdb/apd/v3 v3.1.0
