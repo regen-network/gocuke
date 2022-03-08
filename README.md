@@ -5,18 +5,10 @@
 `gocuke` is a Gherkin-based BDD testing library for golang. It is inspired by
 [godog](https://github.com/cucumber/godog) and [gobdd](https://github.com/go-bdd/gobdd).
 
-## Why another golang BDD library?
+## Features
 
-Sorry guys. I tried godog and gobdd and wanted a specific developer UX that
-I couldn't achieve with either. godog was not a good fit for the same reasons
-as that gobdd was created (specifically tight integration with `*testing.T`).
-Looking at the source code for gobdd, it wasn't that complex but needed to
-be updated to a new versions of cucumber/gherkin-go and cucumber/messages-go
-which was basically a complete rewrite anyway.
-
-This library offers:
 * tight integration with `*testing.T` (use any standard assertion library or mocking framework)
-* support for passing context between steps using suites which offers better 
+* support for passing context between steps using suites which offers better
   type safety than other generic context approaches
 * auto-discovery of step definitions defined as test suite methods and step
   definition suggestions for minimal configuration
@@ -26,6 +18,15 @@ This library offers:
 * parallel test execution by default
 * full support for all of the latest Gherkin features including rules (via
   the latest cucumber/gherkin-go and cucumber/messages-go)
+
+## Why another golang BDD library?
+
+I tried godog and gobdd and wanted a specific developer UX that
+I couldn't achieve with either. godog was not a good fit for the same reasons
+as that gobdd was created (specifically tight integration with `*testing.T`).
+Looking at the source code for gobdd, it wasn't that complex but needed to
+be updated to a new versions of cucumber/gherkin-go and cucumber/messages-go
+which was basically a complete rewrite anyway.
 
 ## Quick Start
 
