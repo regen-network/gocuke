@@ -1,5 +1,7 @@
 # gocuke
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/aaronc/gocuke.svg)](https://pkg.go.dev/github.com/aaronc/gocuke)
+
 `gocuke` is a Gherkin-based BDD testing library for golang. It is inspired by
 [godog](https://github.com/cucumber/godog) and [gobdd](https://github.com/go-bdd/gobdd).
 
