@@ -4,47 +4,21 @@ import (
 	"gotest.tools/v3/assert"
 	"reflect"
 	"regexp"
+	"testing"
 )
 
 type stepDef struct {
-	exp      *regexp.Regexp
-	f        reflect.Value
-	hasRapid bool
+	regex       *regexp.Regexp
+	theFunc     reflect.Value
+	specialArgs []*specialArg
 }
 
-func newStepDef(t TestingT, suiteType reflect.Type, exp *regexp.Regexp, f reflect.Value) *stepDef {
-	typ := f.Type()
-	if typ.Kind() != reflect.Func {
-		t.Fatalf("expected step method, got %s", f)
-	}
-
-	if typ.NumIn() < 1 {
-		t.Fatalf("expected at least 1 parameter for method %s", f)
-	}
-
-	in0 := typ.In(0)
-	if in0 != suiteType {
-		t.Fatalf("expected at first parameter of method %s to be of type %v", f, in0)
-	}
-
-	hasRapid := false
-	if typ.NumIn() > 1 {
-		in1 := typ.In(1)
-		if in1 == rapidTType {
-			hasRapid = true
-		}
-	}
-
-	if typ.NumOut() != 0 {
-		t.Fatalf("expected 0 out parameters for method %+v", f.String())
-	}
-
-	return &stepDef{
-		exp:      exp,
-		f:        f,
-		hasRapid: hasRapid,
-	}
+type specialArg struct {
+	typ      reflect.Type
+	getValue specialArgGetter
 }
+
+type specialArgGetter func(*scenarioRunner) interface{}
 
 // Step can be used to manually register a step with the runner. step should
 // be a string or *regexp.Regexp instance. definition should be a function
@@ -67,7 +41,45 @@ func (r *Runner) Step(step interface{}, definition interface{}) *Runner {
 		assert.NilError(r.topLevelT, err)
 	}
 
-	r.stepDefs = append(r.stepDefs, newStepDef(r.topLevelT, r.suiteType, exp, reflect.ValueOf(definition)))
+	_ = r.addStepDef(r.topLevelT, exp, reflect.ValueOf(definition))
 
 	return r
+}
+
+func (r *Runner) addStepDef(t *testing.T, exp *regexp.Regexp, definition reflect.Value) *stepDef {
+	def := r.newStepDefOrHook(t, exp, definition)
+	r.stepDefs = append(r.stepDefs, def)
+	return def
+}
+
+func (r *Runner) newStepDefOrHook(t *testing.T, exp *regexp.Regexp, f reflect.Value) *stepDef {
+	typ := f.Type()
+	if typ.Kind() != reflect.Func {
+		t.Fatalf("expected step method, got %s", f)
+	}
+
+	def := &stepDef{
+		regex:   exp,
+		theFunc: f,
+	}
+
+	for i := 0; i < typ.NumIn(); i++ {
+		typ := typ.In(i)
+		getter, ok := r.supportedSpecialArgs[typ]
+		if !ok {
+			// expect remaining args to be step arguments
+			break
+		}
+
+		def.specialArgs = append(def.specialArgs, &specialArg{
+			typ:      typ,
+			getValue: getter,
+		})
+	}
+
+	if typ.NumOut() != 0 {
+		t.Fatalf("expected 0 out parameters for method %+v", f.String())
+	}
+
+	return def
 }

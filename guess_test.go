@@ -9,7 +9,7 @@ import (
 func TestGuessMethodSig(t *testing.T) {
 	NewRunner(t, func(t TestingT) Suite {
 		return &guessSuite{TestingT: t}
-	}).WithPath("features/guess.feature").Run()
+	}).Path("features/guess.feature").Run()
 }
 
 type guessSuite struct {

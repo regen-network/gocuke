@@ -2,23 +2,43 @@ package gocuke
 
 import (
 	"github.com/cucumber/messages-go/v16"
-	"pgregory.net/rapid"
 	"reflect"
 )
 
-func (r *Runner) runStep(t TestingT, step *messages.PickleStep, def *stepDef, s Suite) {
-	matches := def.exp.FindSubmatch([]byte(step.Text))
+func (r *scenarioRunner) runHook(def *stepDef) {
+	typ := def.theFunc.Type()
+	expectedIn := len(def.specialArgs)
+	if expectedIn != typ.NumIn() {
+		r.t.Fatalf("expected %d in parameter(s) for function %+v, got %d", expectedIn, def.theFunc.String(), typ.NumIn())
+	}
+
+	values := make([]reflect.Value, expectedIn)
+
+	for i, arg := range def.specialArgs {
+		values[i] = reflect.ValueOf(arg.getValue(r))
+	}
+
+	def.theFunc.Call(values)
+}
+
+func (r *scenarioRunner) runStep(step *messages.PickleStep, def *stepDef) {
+	for _, hook := range r.beforeStepHooks {
+		r.runHook(hook)
+	}
+
+	for _, hook := range r.afterStepHooks {
+		defer r.runHook(hook)
+	}
+
+	matches := def.regex.FindSubmatch([]byte(step.Text))
 	if len(matches) == 0 {
-		t.Fatalf("internal error: no matches found when matching %s against %s", def.exp.String(), step.Text)
+		r.t.Fatalf("internal error: no matches found when matching %s against %s", def.regex.String(), step.Text)
 	}
 
 	matches = matches[1:]
-	expectedIn := len(matches) + 1
-	typ := def.f.Type()
-
-	if def.hasRapid {
-		expectedIn += 1
-	}
+	numSpecialArgs := len(def.specialArgs)
+	expectedIn := len(matches) + numSpecialArgs
+	typ := def.theFunc.Type()
 
 	hasPickleArg := step.Argument != nil
 	if hasPickleArg {
@@ -26,20 +46,17 @@ func (r *Runner) runStep(t TestingT, step *messages.PickleStep, def *stepDef, s 
 	}
 
 	if expectedIn != typ.NumIn() {
-		t.Fatalf("expected %d in parameter(s) for function %+v, got %d", expectedIn, def.f.String(), typ.NumIn())
+		r.t.Fatalf("expected %d in parameter(s) for function %+v, got %d", expectedIn, def.theFunc.String(), typ.NumIn())
 	}
 
 	values := make([]reflect.Value, expectedIn)
-	values[0] = reflect.ValueOf(s)
 
-	offset := 1
-	if def.hasRapid {
-		values[offset] = reflect.ValueOf(t.(*rapid.T))
-		offset++
+	for i, arg := range def.specialArgs {
+		values[i] = reflect.ValueOf(arg.getValue(r))
 	}
 
 	for i, match := range matches {
-		values[i+offset] = convertParamValue(t, string(match), typ.In(i+offset))
+		values[i+numSpecialArgs] = convertParamValue(r.t, string(match), typ.In(i+numSpecialArgs))
 	}
 
 	// pickleArg goes last
@@ -49,17 +66,17 @@ func (r *Runner) runStep(t TestingT, step *messages.PickleStep, def *stepDef, s 
 		// only one of DataTable or DocString is valid
 		if typ == dataTableType {
 			if step.Argument.DataTable == nil {
-				t.Fatalf("expected non-nil DataTable")
+				r.t.Fatalf("expected non-nil DataTable")
 			}
 
 			dataTable := DataTable{
-				t:     t,
+				t:     r.t,
 				table: step.Argument.DataTable,
 			}
 			values[i] = reflect.ValueOf(dataTable)
 		} else if typ == docStringType {
 			if step.Argument.DocString == nil {
-				t.Fatalf("expected non-nil DocString")
+				r.t.Fatalf("expected non-nil DocString")
 			}
 
 			docString := DocString{
@@ -68,9 +85,9 @@ func (r *Runner) runStep(t TestingT, step *messages.PickleStep, def *stepDef, s 
 			}
 			values[i] = reflect.ValueOf(docString)
 		} else {
-			t.Fatalf("unexpected parameter type %v", typ)
+			r.t.Fatalf("unexpected parameter type %v", typ)
 		}
 	}
 
-	def.f.Call(values)
+	def.theFunc.Call(values)
 }

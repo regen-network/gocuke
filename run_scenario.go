@@ -19,8 +19,13 @@ func (r *docRunner) runScenario(t *testing.T, pickle *messages.Pickle) {
 
 	haveRapid := false
 	for _, def := range stepDefs {
-		if def.hasRapid {
-			haveRapid = true
+		for _, arg := range def.specialArgs {
+			if arg.typ == rapidTType {
+				haveRapid = true
+				break
+			}
+		}
+		if haveRapid {
 			break
 		}
 	}
@@ -32,25 +37,47 @@ func (r *docRunner) runScenario(t *testing.T, pickle *messages.Pickle) {
 
 		if haveRapid {
 			rapid.Check(t, func(t *rapid.T) {
-				r.runSteps(t, pickle, stepDefs)
+				(&scenarioRunner{
+					docRunner: r,
+					t:         t,
+					pickle:    pickle,
+					stepDefs:  stepDefs,
+				}).runTestCase()
 			})
 		} else {
-			r.runSteps(t, pickle, stepDefs)
+			(&scenarioRunner{
+				docRunner: r,
+				t:         t,
+				pickle:    pickle,
+				stepDefs:  stepDefs,
+			}).runTestCase()
 		}
 	})
 }
 
-func (r *Runner) runSteps(t TestingT, pickle *messages.Pickle, stepDefs []*stepDef) {
-	s := r.initScenario(t)
-	if cleanup, ok := s.(interface{ Cleanup() }); ok {
-		if t, ok := t.(interface{ Cleanup(func()) }); ok {
-			t.Cleanup(func() { cleanup.Cleanup() })
+type scenarioRunner struct {
+	*docRunner
+	t        TestingT
+	s        Suite
+	pickle   *messages.Pickle
+	stepDefs []*stepDef
+}
+
+func (r *scenarioRunner) runTestCase() {
+	r.s = r.initScenario(r.t)
+	for _, hook := range r.beforeHooks {
+		r.runHook(hook)
+	}
+
+	for _, hook := range r.afterHooks {
+		if t, ok := r.t.(interface{ Cleanup(func()) }); ok {
+			t.Cleanup(func() { r.runHook(hook) })
 		} else {
-			defer cleanup.Cleanup()
+			defer r.runHook(hook)
 		}
 	}
 
-	for i, step := range pickle.Steps {
-		r.runStep(t, step, stepDefs[i], s)
+	for i, step := range r.pickle.Steps {
+		r.runStep(step, r.stepDefs[i])
 	}
 }

@@ -10,7 +10,7 @@ func TestSimple(t *testing.T) {
 	t.Parallel()
 	gocuke.NewRunner(t, func(t gocuke.TestingT) gocuke.Suite {
 		return &simpleSuite{TestingT: t}
-	}).WithPath("features/simple.feature").Run()
+	}).Path("features/simple.feature").Run()
 }
 
 type simpleSuite struct {
@@ -37,7 +37,7 @@ func TestCustomSteps(t *testing.T) {
 	gocuke.NewRunner(t, func(t gocuke.TestingT) gocuke.Suite {
 		return &customStepsSuite{TestingT: t}
 	}).
-		WithPath("features/simple.feature").
+		Path("features/simple.feature").
 		Step(`I have (\d+) cukes`, (*customStepsSuite).A).
 		Step(regexp.MustCompile(`I eat (\d+)`), (*customStepsSuite).B).
 		Step(`I have (\d+) left`, (*customStepsSuite).C).

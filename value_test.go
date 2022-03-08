@@ -13,7 +13,7 @@ import (
 func TestValues(t *testing.T) {
 	NewRunner(t, func(t TestingT) Suite {
 		return &valuesSuite{TestingT: t}
-	}).WithPath("features/values.feature").Run()
+	}).Path("features/values.feature").Run()
 }
 
 type valuesSuite struct {

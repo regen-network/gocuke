@@ -149,9 +149,9 @@ Your tests should now pass!
 `gocuke.DocString` or `gocuke.DataTable` should be used as the last argument
 in a step definition if the step uses a doc string or data table.
 
-### `Cleanup` Methods
+### Hooks Methods
 
-Test suites that define a `Cleanup` method will have that method called at
+Test suites that define an `After` method will have that method called at
 the end of testing even if the test failed.
 
 ### Property-based testing using Rapid

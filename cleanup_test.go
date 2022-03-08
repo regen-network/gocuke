@@ -8,7 +8,7 @@ import (
 func TestCleanup(t *testing.T) {
 	NewRunner(t, func(t TestingT) Suite {
 		return &cleanupSuite{TestingT: t}
-	}).WithPath("features/cleanup.feature").Run()
+	}).Path("features/cleanup.feature").Run()
 
 	if open != 0 {
 		t.Fatalf("expected resource to be closed")
@@ -38,6 +38,6 @@ func (s *cleanupSuite) ItIsOpen() {
 	}
 }
 
-func (s *cleanupSuite) Cleanup() {
+func (s *cleanupSuite) After() {
 	open -= s.numOpen
 }
