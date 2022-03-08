@@ -27,7 +27,8 @@ I couldn't achieve with either. godog was not a good fit for the same reasons
 as that gobdd was created (specifically tight integration with `*testing.T`).
 Looking at the source code for gobdd, it wasn't that complex but needed to
 be updated to a new versions of cucumber/gherkin-go and cucumber/messages-go
-which was basically a complete rewrite.
+which was basically a complete rewrite. Happy to coordinate with the authors
+of either of these libraries at some point to align on common goals.
 
 ## Quick Start
 
