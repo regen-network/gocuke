@@ -19,9 +19,13 @@ func newDocRunner(runner *Runner, doc *messages.GherkinDocument) *docRunner {
 }
 
 func (r *docRunner) runDoc(t *testing.T) {
+	t.Helper()
+
 	pickles := gherkin.Pickles(*r.doc, r.doc.Uri, r.incr.NewId)
 	for _, pickle := range pickles {
 		t.Run(pickle.Name, func(t *testing.T) {
+			t.Helper()
+
 			if r.parallel {
 				t.Parallel()
 			}

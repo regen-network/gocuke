@@ -35,6 +35,8 @@ func (r *Runner) Run() {
 			doc, err := gherkin.ParseGherkinDocument(f, r.incr.NewId)
 			assert.NilError(r.topLevelT, err)
 			r.topLevelT.Run(file, func(t *testing.T) {
+				t.Helper()
+
 				if r.parallel {
 					t.Parallel()
 				}
@@ -46,7 +48,7 @@ func (r *Runner) Run() {
 
 	if len(r.suggestions) != 0 {
 		var suiteTypeName string
-		if r.suiteType.Kind() == reflect.Pointer {
+		if r.suiteType.Kind() == reflect.Ptr {
 			suiteTypeName = "*" + r.suiteType.Elem().Name()
 		} else {
 			suiteTypeName = r.suiteType.Name()
