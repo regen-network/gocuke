@@ -68,7 +68,7 @@ func guessMethodSig(step *messages.PickleStep) methodSig {
 		regexParts = append(regexParts, regexp.QuoteMeta(part))
 	}
 
-	regex := regexp.MustCompile(strings.Join(regexParts, ` `))
+	regex := regexp.MustCompile(`^` + strings.Join(regexParts, `\s+`) + `$`)
 
 	if step.Argument != nil {
 		if step.Argument.DataTable != nil {

@@ -4,6 +4,7 @@ import (
 	"gotest.tools/v3/assert"
 	"reflect"
 	"regexp"
+	"runtime"
 	"testing"
 )
 
@@ -11,6 +12,7 @@ type stepDef struct {
 	regex       *regexp.Regexp
 	theFunc     reflect.Value
 	specialArgs []*specialArg
+	funcName    string
 }
 
 type specialArg struct {
@@ -58,9 +60,12 @@ func (r *Runner) newStepDefOrHook(t *testing.T, exp *regexp.Regexp, f reflect.Va
 		t.Fatalf("expected step method, got %s", f)
 	}
 
+	rfunc := runtime.FuncForPC(f.Pointer())
+
 	def := &stepDef{
-		regex:   exp,
-		theFunc: f,
+		regex:    exp,
+		theFunc:  f,
+		funcName: rfunc.Name(),
 	}
 
 	for i := 0; i < typ.NumIn(); i++ {

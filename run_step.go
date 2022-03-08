@@ -9,7 +9,7 @@ func (r *scenarioRunner) runHook(def *stepDef) {
 	typ := def.theFunc.Type()
 	expectedIn := len(def.specialArgs)
 	if expectedIn != typ.NumIn() {
-		r.t.Fatalf("expected %d in parameter(s) for function %+v, got %d", expectedIn, def.theFunc.String(), typ.NumIn())
+		r.t.Fatalf("expected %d in parameter(s) for function %+v, got %d", expectedIn, def.funcName, typ.NumIn())
 	}
 
 	values := make([]reflect.Value, expectedIn)
@@ -46,7 +46,7 @@ func (r *scenarioRunner) runStep(step *messages.PickleStep, def *stepDef) {
 	}
 
 	if expectedIn != typ.NumIn() {
-		r.t.Fatalf("expected %d in parameter(s) for function %+v, got %d", expectedIn, def.theFunc.String(), typ.NumIn())
+		r.t.Fatalf("expected %d in parameter(s) for function %+v, got %d", expectedIn, def.funcName, typ.NumIn())
 	}
 
 	values := make([]reflect.Value, expectedIn)

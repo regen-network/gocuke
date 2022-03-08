@@ -31,10 +31,9 @@ type Runner struct {
 // for usage in each step.
 func NewRunner(t *testing.T, initScenario func(t TestingT) Suite) *Runner {
 	r := &Runner{
-		topLevelT:    t,
-		initScenario: initScenario,
-		incr:         &messages.Incrementing{},
-		suggestions:  map[string]methodSig{},
+		topLevelT:   t,
+		incr:        &messages.Incrementing{},
+		suggestions: map[string]methodSig{},
 		supportedSpecialArgs: map[reflect.Type]specialArgGetter{
 			// TestingT
 			reflect.TypeOf((*TestingT)(nil)).Elem(): func(runner *scenarioRunner) interface{} {
@@ -51,11 +50,14 @@ func NewRunner(t *testing.T, initScenario func(t TestingT) Suite) *Runner {
 		},
 	}
 
+	r.setupSuite(initScenario)
+
 	return r
 }
 
 func (r *Runner) setupSuite(initScenario func(t TestingT) Suite) {
 	s := initScenario(r.topLevelT)
+	r.initScenario = initScenario
 	r.suiteType = reflect.TypeOf(s)
 	r.supportedSpecialArgs[r.suiteType] = func(runner *scenarioRunner) interface{} {
 		return runner.s
