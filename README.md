@@ -152,7 +152,7 @@ in a step definition if the step uses a doc string or data table.
 ### `Cleanup` Methods
 
 Test suites that define a `Cleanup` method will have that method called at
-the end of testing (regardless of whether the test was successful).
+the end of testing even if the test failed.
 
 ### Property-based testing using Rapid
 

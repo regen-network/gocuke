@@ -35,6 +35,7 @@ func NewRunner(t *testing.T, initScenario func(t TestingT) Suite) *Runner {
 	}
 }
 
+// Suite is a dummy interface to mark a test suite.
 type Suite interface{}
 
 // WithPath specifies glob paths for the runner to look up .feature files.
