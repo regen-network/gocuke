@@ -7,7 +7,7 @@ import (
 )
 
 func TestGuessMethodSig(t *testing.T) {
-	NewRunner(t, func(t TestingT) Suite {
+	NewRunner(t, func(t TestingT) StepDefinitions {
 		return &guessSuite{TestingT: t}
 	}).Path("features/guess.feature").Run()
 }

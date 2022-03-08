@@ -6,10 +6,12 @@ import (
 )
 
 func (r *scenarioRunner) runHook(def *stepDef) {
+	r.t.Helper()
+
 	typ := def.theFunc.Type()
 	expectedIn := len(def.specialArgs)
 	if expectedIn != typ.NumIn() {
-		r.t.Fatalf("expected %d in parameter(s) for function %+v, got %d", expectedIn, def.funcName, typ.NumIn())
+		r.t.Fatalf("expected %d in parameter(s) for function %+v, got %d", expectedIn, def.funcLoc, typ.NumIn())
 	}
 
 	values := make([]reflect.Value, expectedIn)
@@ -22,6 +24,8 @@ func (r *scenarioRunner) runHook(def *stepDef) {
 }
 
 func (r *scenarioRunner) runStep(step *messages.PickleStep, def *stepDef) {
+	r.t.Helper()
+
 	for _, hook := range r.beforeStepHooks {
 		r.runHook(hook)
 	}
@@ -46,7 +50,7 @@ func (r *scenarioRunner) runStep(step *messages.PickleStep, def *stepDef) {
 	}
 
 	if expectedIn != typ.NumIn() {
-		r.t.Fatalf("expected %d in parameter(s) for function %+v, got %d", expectedIn, def.funcName, typ.NumIn())
+		r.t.Fatalf("expected %d in parameter(s) for function %+v, got %d", expectedIn, def.funcLoc, typ.NumIn())
 	}
 
 	values := make([]reflect.Value, expectedIn)
@@ -56,7 +60,7 @@ func (r *scenarioRunner) runStep(step *messages.PickleStep, def *stepDef) {
 	}
 
 	for i, match := range matches {
-		values[i+numSpecialArgs] = convertParamValue(r.t, string(match), typ.In(i+numSpecialArgs))
+		values[i+numSpecialArgs] = convertParamValue(r.t, string(match), typ.In(i+numSpecialArgs), def.funcLoc)
 	}
 
 	// pickleArg goes last
@@ -85,7 +89,7 @@ func (r *scenarioRunner) runStep(step *messages.PickleStep, def *stepDef) {
 			}
 			values[i] = reflect.ValueOf(docString)
 		} else {
-			r.t.Fatalf("unexpected parameter type %v", typ)
+			r.t.Fatalf("unexpected parameter type %v in function %s", typ, def.funcLoc)
 		}
 	}
 

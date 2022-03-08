@@ -6,7 +6,7 @@ import (
 )
 
 func TestDataTable(t *testing.T) {
-	NewRunner(t, func(t TestingT) Suite {
+	NewRunner(t, func(t TestingT) StepDefinitions {
 		return &dataTableSuite{TestingT: t}
 	}).Path("features/datatable.feature").Run()
 }

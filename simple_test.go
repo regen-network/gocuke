@@ -8,7 +8,7 @@ import (
 
 func TestSimple(t *testing.T) {
 	t.Parallel()
-	gocuke.NewRunner(t, func(t gocuke.TestingT) gocuke.Suite {
+	gocuke.NewRunner(t, func(t gocuke.TestingT) gocuke.StepDefinitions {
 		return &simpleSuite{TestingT: t}
 	}).Path("features/simple.feature").Run()
 }
@@ -34,7 +34,7 @@ func (s *simpleSuite) IHaveLeft(a int64) {
 
 func TestCustomSteps(t *testing.T) {
 	t.Parallel()
-	gocuke.NewRunner(t, func(t gocuke.TestingT) gocuke.Suite {
+	gocuke.NewRunner(t, func(t gocuke.TestingT) gocuke.StepDefinitions {
 		return &customStepsSuite{TestingT: t}
 	}).
 		Path("features/simple.feature").

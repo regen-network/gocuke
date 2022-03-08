@@ -6,6 +6,8 @@ import (
 )
 
 func (r *Runner) findStep(t *testing.T, step *messages.PickleStep) *stepDef {
+	t.Helper()
+
 	for _, def := range r.stepDefs {
 		matches := def.regex.FindSubmatch([]byte(step.Text))
 		if len(matches) != 0 {

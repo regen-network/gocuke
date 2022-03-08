@@ -6,7 +6,7 @@ import (
 )
 
 func TestCleanup(t *testing.T) {
-	NewRunner(t, func(t TestingT) Suite {
+	NewRunner(t, func(t TestingT) StepDefinitions {
 		return &cleanupSuite{TestingT: t}
 	}).Path("features/cleanup.feature").Run()
 

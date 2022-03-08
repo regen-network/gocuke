@@ -1,6 +1,7 @@
 package gocuke
 
 import (
+	"fmt"
 	"gotest.tools/v3/assert"
 	"reflect"
 	"regexp"
@@ -12,7 +13,7 @@ type stepDef struct {
 	regex       *regexp.Regexp
 	theFunc     reflect.Value
 	specialArgs []*specialArg
-	funcName    string
+	funcLoc     string
 }
 
 type specialArg struct {
@@ -31,6 +32,8 @@ type specialArgGetter func(*scenarioRunner) interface{}
 // Custom step definitions will always take priority of auto-discovered step
 // definitions.
 func (r *Runner) Step(step interface{}, definition interface{}) *Runner {
+	r.topLevelT.Helper()
+
 	exp, ok := step.(*regexp.Regexp)
 	if !ok {
 		str, ok := step.(string)
@@ -49,23 +52,29 @@ func (r *Runner) Step(step interface{}, definition interface{}) *Runner {
 }
 
 func (r *Runner) addStepDef(t *testing.T, exp *regexp.Regexp, definition reflect.Value) *stepDef {
+	t.Helper()
+
 	def := r.newStepDefOrHook(t, exp, definition)
 	r.stepDefs = append(r.stepDefs, def)
 	return def
 }
 
 func (r *Runner) newStepDefOrHook(t *testing.T, exp *regexp.Regexp, f reflect.Value) *stepDef {
+	t.Helper()
+
 	typ := f.Type()
 	if typ.Kind() != reflect.Func {
 		t.Fatalf("expected step method, got %s", f)
 	}
 
-	rfunc := runtime.FuncForPC(f.Pointer())
+	funcPtr := f.Pointer()
+	rfunc := runtime.FuncForPC(funcPtr)
+	file, line := rfunc.FileLine(funcPtr)
 
 	def := &stepDef{
-		regex:    exp,
-		theFunc:  f,
-		funcName: rfunc.Name(),
+		regex:   exp,
+		theFunc: f,
+		funcLoc: fmt.Sprintf("%s (%s:%d)", rfunc.Name(), file, line),
 	}
 
 	for i := 0; i < typ.NumIn(); i++ {

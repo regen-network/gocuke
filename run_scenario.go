@@ -8,6 +8,7 @@ import (
 
 func (r *docRunner) runScenario(t *testing.T, pickle *messages.Pickle) {
 	t.Helper()
+
 	stepDefs := make([]*stepDef, len(pickle.Steps))
 	for i, step := range pickle.Steps {
 		stepDefs[i] = r.findStep(t, step)
@@ -31,6 +32,8 @@ func (r *docRunner) runScenario(t *testing.T, pickle *messages.Pickle) {
 	}
 
 	t.Run(pickle.Name, func(t *testing.T) {
+		t.Helper()
+
 		if r.parallel {
 			t.Parallel()
 		}
@@ -58,12 +61,14 @@ func (r *docRunner) runScenario(t *testing.T, pickle *messages.Pickle) {
 type scenarioRunner struct {
 	*docRunner
 	t        TestingT
-	s        Suite
+	s        StepDefinitions
 	pickle   *messages.Pickle
 	stepDefs []*stepDef
 }
 
 func (r *scenarioRunner) runTestCase() {
+	r.t.Helper()
+
 	r.s = r.initScenario(r.t)
 	for _, hook := range r.beforeHooks {
 		r.runHook(hook)

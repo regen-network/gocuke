@@ -35,6 +35,8 @@ func (r *Runner) Run() {
 			doc, err := gherkin.ParseGherkinDocument(f, r.incr.NewId)
 			assert.NilError(r.topLevelT, err)
 			r.topLevelT.Run(file, func(t *testing.T) {
+				t.Helper()
+
 				if r.parallel {
 					t.Parallel()
 				}
