@@ -2,16 +2,11 @@ package gocuke_test
 
 import (
 	"github.com/aaronc/gocuke"
-	"github.com/stretchr/testify/require"
-	"regexp"
 	"testing"
 )
 
 func TestSimple(t *testing.T) {
-	t.Parallel()
-	//gocuke.NewRunner(t, func(t gocuke.TestingT) gocuke.StepDefinitions {
-	//	return &simpleSuite{TestingT: t}
-	//}).Path("features/simple.feature").Run()
+	gocuke.NewRunner(t, &simpleSuite{}).Path("features/simple.feature").Run()
 }
 
 type simpleSuite struct {
@@ -33,65 +28,27 @@ func (s *simpleSuite) IHaveLeft(a int64) {
 	}
 }
 
-func TestCustomSteps(t *testing.T) {
-	t.Parallel()
-	gocuke.NewRunner(t, &customStepsSuite{}).
-		Path("features/simple.feature").
-		Step(`I have (\d+) cukes`, (*customStepsSuite).A).
-		Step(regexp.MustCompile(`I eat (\d+)`), (*customStepsSuite).B).
-		Step(`I have (\d+) left`, (*customStepsSuite).C).
-		Before((*customStepsSuite).before).
-		After((*customStepsSuite).after).
-		BeforeStep((*customStepsSuite).beforeStep).
-		AfterStep((*customStepsSuite).afterStep).
-		NonParallel().
-		Run()
-
-	require.Equal(t, 2, beforeCalled)
-	require.Equal(t, 2, afterCalled)
-	require.Equal(t, 6, beforeStepCalled)
-	require.Equal(t, 6, afterStepCalled)
+// test if a struct that doesn't use a pointer and a global var
+func TestSimpleNonPointer(t *testing.T) {
+	gocuke.NewRunner(t, simpleSuiteNP{}).Path("features/simple.feature").Run()
 }
 
-var (
-	beforeCalled     int
-	afterCalled      int
-	beforeStepCalled int
-	afterStepCalled  int
-)
+var globalCukes int64
 
-type customStepsSuite struct {
+type simpleSuiteNP struct {
 	gocuke.TestingT
-	cukes int64
 }
 
-func (c *customStepsSuite) before(t gocuke.TestingT) {
-	c.TestingT = t
-	beforeCalled += 1
+func (s simpleSuiteNP) IHaveCukes(a int64) {
+	globalCukes = a
 }
 
-func (s *customStepsSuite) A(a int64) {
-	s.cukes = a
+func (s simpleSuiteNP) IEat(a int64) {
+	globalCukes -= a
 }
 
-func (s *customStepsSuite) B(a int64) {
-	s.cukes -= a
-}
-
-func (s *customStepsSuite) C(a int64) {
-	if a != s.cukes {
-		s.Fatalf("expected %d cukes, have %d", a, s.cukes)
+func (s simpleSuiteNP) IHaveLeft(a int64) {
+	if a != globalCukes {
+		s.Fatalf("expected %d cukes, have %d", a, globalCukes)
 	}
-}
-
-func (c *customStepsSuite) after() {
-	afterCalled += 1
-}
-
-func (c *customStepsSuite) beforeStep() {
-	beforeStepCalled += 1
-}
-
-func (c *customStepsSuite) afterStep() {
-	afterStepCalled += 1
 }

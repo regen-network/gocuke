@@ -11,18 +11,23 @@ import (
 type Runner struct {
 	topLevelT            *testing.T
 	suiteType            reflect.Type
-	initScenario         func() interface{}
 	incr                 *messages.Incrementing
 	paths                []string
 	parallel             bool
 	stepDefs             []*stepDef
 	suggestions          map[string]methodSig
 	supportedSpecialArgs map[reflect.Type]specialArgGetter
+	suiteInjectors       []*suiteInjector
 	beforeHooks          []*stepDef
 	afterHooks           []*stepDef
 	beforeStepHooks      []*stepDef
 	afterStepHooks       []*stepDef
-	hooksUseRapid        bool
+	suiteUsesRapid       bool
+}
+
+type suiteInjector struct {
+	getValue specialArgGetter
+	field    reflect.StructField
 }
 
 // NewRunner constructs a new Runner with the provided initScenario function.
@@ -57,30 +62,39 @@ func NewRunner(t *testing.T, stepDefinitionsType interface{}) *Runner {
 				return scenario{runner.pickle}
 			},
 		},
-		hooksUseRapid: false,
+		suiteUsesRapid: false,
 	}
 
-	r.registerStepDefinitions(stepDefinitionsType)
+	r.registerSuite(stepDefinitionsType)
 
 	return r
 }
 
-func (r *Runner) registerStepDefinitions(stepDefinitionsType interface{}) *Runner {
+func (r *Runner) registerSuite(stepDefinitionsType interface{}) *Runner {
 	r.topLevelT.Helper()
 
 	typ := reflect.TypeOf(stepDefinitionsType)
 	r.suiteType = typ
 	kind := typ.Kind()
-	if kind == reflect.Ptr && typ.Elem().Kind() == reflect.Struct {
-		r.initScenario = func() interface{} {
-			return reflect.New(typ.Elem()).Interface()
-		}
-	} else if kind == reflect.Struct {
-		r.initScenario = func() interface{} {
-			return reflect.Zero(typ).Interface()
-		}
-	} else {
+
+	suiteElemType := r.suiteType
+	if kind == reflect.Ptr {
+		suiteElemType = suiteElemType.Elem()
+	}
+
+	if suiteElemType.Kind() != reflect.Struct {
 		r.topLevelT.Fatalf("expected a struct or a pointer to a struct, got %T", stepDefinitionsType)
+	}
+
+	for i := 0; i < suiteElemType.NumField(); i++ {
+		field := suiteElemType.Field(i)
+		if !field.IsExported() {
+			continue
+		}
+
+		if getter, ok := r.supportedSpecialArgs[field.Type]; ok {
+			r.suiteInjectors = append(r.suiteInjectors, &suiteInjector{getValue: getter, field: field})
+		}
 	}
 
 	r.supportedSpecialArgs[r.suiteType] = func(runner *scenarioRunner) interface{} {

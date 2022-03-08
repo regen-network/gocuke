@@ -38,7 +38,7 @@ func (r *Runner) AfterStep(hook interface{}) *Runner {
 func (r *Runner) addHook(hooks *[]*stepDef, f reflect.Value) {
 	def := r.newStepDefOrHook(r.topLevelT, nil, f)
 	if def.usesRapid() {
-		r.hooksUseRapid = true
+		r.suiteUsesRapid = true
 	}
 	*hooks = append(*hooks, def)
 }

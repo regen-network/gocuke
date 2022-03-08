@@ -3,6 +3,7 @@ package gocuke
 import (
 	"github.com/cucumber/messages-go/v16"
 	"pgregory.net/rapid"
+	"reflect"
 	"testing"
 )
 
@@ -18,7 +19,7 @@ func (r *docRunner) runScenario(t *testing.T, pickle *messages.Pickle) {
 		return
 	}
 
-	useRapid := r.hooksUseRapid
+	useRapid := r.suiteUsesRapid
 	if !useRapid {
 		for _, def := range stepDefs {
 			if def.usesRapid() {
@@ -66,7 +67,24 @@ type scenarioRunner struct {
 func (r *scenarioRunner) runTestCase() {
 	r.t.Helper()
 
-	r.s = r.initScenario()
+	var val reflect.Value
+	needPtr := r.suiteType.Kind() == reflect.Ptr
+	if needPtr {
+		val = reflect.New(r.suiteType.Elem())
+	} else {
+		val = reflect.New(r.suiteType)
+	}
+
+	for _, injector := range r.suiteInjectors {
+		val.Elem().FieldByName(injector.field.Name).Set(reflect.ValueOf(injector.getValue(r)))
+	}
+
+	if needPtr {
+		r.s = val.Interface()
+	} else {
+		r.s = val.Elem().Interface()
+	}
+
 	for _, hook := range r.beforeHooks {
 		r.runHook(hook)
 	}

@@ -7,13 +7,11 @@ import (
 )
 
 func TestHooks(t *testing.T) {
-	//NewRunner(t, func(t TestingT) StepDefinitions {
-	//	return &hooksSuite{TestingT: t}
-	//}).Path("features/hooks.feature").Run()
-	//
-	//if open != 0 {
-	//	t.Fatalf("expected resource to be closed")
-	//}
+	NewRunner(t, &hooksSuite{}).Path("features/hooks.feature").Run()
+
+	if open != 0 {
+		t.Fatalf("expected resource to be closed")
+	}
 }
 
 var open int64 = 0
