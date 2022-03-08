@@ -6,27 +6,27 @@ import (
 	"testing"
 )
 
-func TestMinimal(t *testing.T) {
+func TestSimple(t *testing.T) {
 	t.Parallel()
 	gocuke.NewRunner(t, func(t gocuke.TestingT) gocuke.Suite {
-		return &minimalSuite{TestingT: t}
+		return &simpleSuite{TestingT: t}
 	}).WithPath("features/simple.feature").Run()
 }
 
-type minimalSuite struct {
+type simpleSuite struct {
 	gocuke.TestingT
 	cukes int64
 }
 
-func (s *minimalSuite) IHaveCukes(a int64) {
+func (s *simpleSuite) IHaveCukes(a int64) {
 	s.cukes = a
 }
 
-func (s *minimalSuite) IEat(a int64) {
+func (s *simpleSuite) IEat(a int64) {
 	s.cukes -= a
 }
 
-func (s *minimalSuite) IHaveLeft(a int64) {
+func (s *simpleSuite) IHaveLeft(a int64) {
 	if a != s.cukes {
 		s.Fatalf("expected %d cukes, have %d", a, s.cukes)
 	}

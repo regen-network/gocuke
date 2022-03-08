@@ -42,6 +42,14 @@ func (r *docRunner) runScenario(t *testing.T, pickle *messages.Pickle) {
 
 func (r *Runner) runSteps(t TestingT, pickle *messages.Pickle, stepDefs []*stepDef) {
 	s := r.initScenario(t)
+	if cleanup, ok := s.(interface{ Cleanup() }); ok {
+		if t, ok := t.(interface{ Cleanup(func()) }); ok {
+			t.Cleanup(func() { cleanup.Cleanup() })
+		} else {
+			defer cleanup.Cleanup()
+		}
+	}
+
 	for i, step := range pickle.Steps {
 		r.runStep(t, step, stepDefs[i], s)
 	}

@@ -149,6 +149,11 @@ Your tests should now pass!
 `gocuke.DocString` or `gocuke.DataTable` should be used as the last argument
 in a step definition if the step uses a doc string or data table.
 
+### `Cleanup` Methods
+
+Test suites that define a `Cleanup` method will have that method called at
+the end of testing (regardless of whether the test was successful).
+
 ### Property-based testing using Rapid
 
 Property-based tests using https://github.com/flyingmutant/rapid can be
@@ -186,4 +191,7 @@ func (s *suite) IGetBackTheOriginalValue() {
   assert.Equal(s, s.x, s.parsed)
 }
 ```
+## Roadmap
 
+* tag expression support
+* Cucumber `message` based reporting 
