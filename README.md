@@ -53,7 +53,7 @@ In a file simple_test.go:
 package simple
 
 import (
-	"gocuke"
+	"github.com/aaronc/gocuke"
 	"testing"
 )
 

@@ -1,9 +1,8 @@
-module gocuke
+module github.com/aaronc/gocuke
 
 go 1.18
 
 require (
-	github.com/alecthomas/participle/v2 v2.0.0-alpha7
 	github.com/cockroachdb/apd/v3 v3.1.0
 	github.com/cucumber/gherkin-go/v19 v19.0.3
 	github.com/cucumber/messages-go/v16 v16.0.1

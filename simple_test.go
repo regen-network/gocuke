@@ -1,7 +1,7 @@
 package gocuke_test
 
 import (
-	"gocuke"
+	"github.com/aaronc/gocuke"
 	"testing"
 )
 
