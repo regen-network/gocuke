@@ -48,7 +48,7 @@ func (r *Runner) Run() {
 
 	if len(r.suggestions) != 0 {
 		var suiteTypeName string
-		if r.suiteType.Kind() == reflect.Pointer {
+		if r.suiteType.Kind() == reflect.Ptr {
 			suiteTypeName = "*" + r.suiteType.Elem().Name()
 		} else {
 			suiteTypeName = r.suiteType.Name()
