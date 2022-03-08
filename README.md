@@ -118,9 +118,9 @@ func (s *suite) IHaveLeft(a int64) {
 
 Your tests should now pass!
 
-# Usage Details
+## Usage Details
 
-## Custom options
+### Custom options
 
 Custom `.feature` search paths can be set using the `Runner.WithPath()` method.
 
@@ -130,7 +130,7 @@ in all step definitions.
 
 Parallel tests can be disabled using `Runner.NonParallel()`.
 
-## Supported Param Types
+### Supported Param Types
 
 `gocuke` supports the following parameter types:
 * `string`
@@ -140,12 +140,12 @@ Parallel tests can be disabled using `Runner.NonParallel()`.
 
 `float64` support is not planned because it is lossy!!
 
-## Doc Strings and Data Tables
+### Doc Strings and Data Tables
 
 `gocuke.DocString` or `gocuke.DataTable` should be used as the last argument
 in a step definition if the step uses a doc string or data table.
 
-## Property-based testing using Rapid
+### Property-based testing using Rapid
 
 Property-based tests using https://github.com/flyingmutant/rapid can be
 enabled by using `*rapid.T` as the first argument of test methods (after the
