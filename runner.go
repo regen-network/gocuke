@@ -48,6 +48,10 @@ func NewRunner(t *testing.T, initScenario func(t TestingT) StepDefinitions) *Run
 				runner.t.Fatalf("expected %T, but got %T", &rapid.T{}, runner.t)
 				return nil
 			},
+			// Scenario
+			reflect.TypeOf((*Scenario)(nil)).Elem(): func(runner *scenarioRunner) interface{} {
+				return scenario{runner.pickle}
+			},
 		},
 	}
 
