@@ -8,7 +8,7 @@ import (
 func TestDataTable(t *testing.T) {
 	NewRunner(t, func(t TestingT) Suite {
 		return &dataTableSuite{TestingT: t}
-	}).WithPath("features/datatable.feature").Run()
+	}).Path("features/datatable.feature").Run()
 }
 
 type dataTableSuite struct {

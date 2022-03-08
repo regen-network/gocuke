@@ -129,7 +129,7 @@ Your tests should now pass!
 
 `Runner` has the following methods for setting custom options
 
-* `WithPath()` sets custom paths. The default is `features/*.feature`.
+* `Path()` sets custom paths. The default is `features/*.feature`.
 * `Step()` can be used to add custom steps with special regular expressions.
   The first argument of custom step definitions must still be the suite.
 * `NonParallel()` disables parallel tests.

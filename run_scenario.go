@@ -1,6 +1,7 @@
 package gocuke
 
 import (
+	"github.com/aaronc/gocuke/internal/tag"
 	"github.com/cucumber/messages-go/v16"
 	"pgregory.net/rapid"
 	"testing"
@@ -8,6 +9,18 @@ import (
 
 func (r *docRunner) runScenario(t *testing.T, pickle *messages.Pickle) {
 	t.Helper()
+
+	tags := tag.NewTagsFromPickleTags(pickle.Tags)
+	if !r.tagExpr.Match(tags) {
+		t.SkipNow()
+	}
+
+	if testing.Short() {
+		if !r.shortTagExpr.Match(tags) {
+			t.SkipNow()
+		}
+	}
+
 	stepDefs := make([]*stepDef, len(pickle.Steps))
 	for i, step := range pickle.Steps {
 		stepDefs[i] = r.findStep(t, step)
