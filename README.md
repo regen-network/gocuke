@@ -134,7 +134,7 @@ Your tests should now pass!
   The first argument of custom step definitions must still be the suite.
 * `NonParallel()` disables parallel tests.
 
-### Supported Param Types
+### Step Argument Types
 
 `gocuke` supports the following parameter types:
 * `string`
@@ -142,7 +142,7 @@ Your tests should now pass!
 * `*big.Int`
 * `*apd.Decimal`
 
-`float64` support is not planned because it is lossy!!
+`float64` support is not planned because it is lossy.
 
 ### Doc Strings and Data Tables
 
@@ -193,5 +193,5 @@ func (s *suite) IGetBackTheOriginalValue() {
 ```
 ## Roadmap
 
-* tag expression support
-* Cucumber `message` based reporting 
+* [Tag Expressions](https://cucumber.io/docs/cucumber/api/#tag-expressions)
+* [Cucumber `message` based reporting](https://cucumber.io/docs/cucumber/reporting/)
