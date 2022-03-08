@@ -58,7 +58,7 @@ func (r *docRunner) runScenario(t *testing.T, pickle *messages.Pickle) {
 type scenarioRunner struct {
 	*docRunner
 	t        TestingT
-	s        StepDefinitions
+	s        interface{}
 	pickle   *messages.Pickle
 	stepDefs []*stepDef
 }
@@ -66,7 +66,7 @@ type scenarioRunner struct {
 func (r *scenarioRunner) runTestCase() {
 	r.t.Helper()
 
-	r.s = r.initScenario(r.t)
+	r.s = r.initScenario()
 	for _, hook := range r.beforeHooks {
 		r.runHook(hook)
 	}

@@ -11,7 +11,7 @@ import (
 type Runner struct {
 	topLevelT            *testing.T
 	suiteType            reflect.Type
-	initScenario         func(t TestingT) StepDefinitions
+	initScenario         func() interface{}
 	incr                 *messages.Incrementing
 	paths                []string
 	parallel             bool
@@ -31,7 +31,9 @@ type Runner struct {
 // is expected that the suite will retain a copy of the TestingT instance
 // for usage in each step. Complex initialization should not be done in initScenario
 // but rather with a Before hook.
-func NewRunner(t *testing.T, initScenario func(t TestingT) StepDefinitions) *Runner {
+func NewRunner(t *testing.T, stepDefinitionsType interface{}) *Runner {
+	t.Helper()
+
 	r := &Runner{
 		topLevelT:   t,
 		incr:        &messages.Incrementing{},
@@ -58,45 +60,50 @@ func NewRunner(t *testing.T, initScenario func(t TestingT) StepDefinitions) *Run
 		hooksUseRapid: false,
 	}
 
-	r.setupSuite(initScenario)
+	r.registerStepDefinitions(stepDefinitionsType)
 
 	return r
 }
 
-func (r *Runner) setupSuite(initScenario func(t TestingT) StepDefinitions) {
-	s := initScenario(r.topLevelT)
-	r.initScenario = initScenario
-	r.suiteType = reflect.TypeOf(s)
+func (r *Runner) registerStepDefinitions(stepDefinitionsType interface{}) *Runner {
+	r.topLevelT.Helper()
+
+	typ := reflect.TypeOf(stepDefinitionsType)
+	r.suiteType = typ
+	kind := typ.Kind()
+	if kind == reflect.Ptr && typ.Elem().Kind() == reflect.Struct {
+		r.initScenario = func() interface{} {
+			return reflect.New(typ.Elem()).Interface()
+		}
+	} else if kind == reflect.Struct {
+		r.initScenario = func() interface{} {
+			return reflect.Zero(typ).Interface()
+		}
+	} else {
+		r.topLevelT.Fatalf("expected a struct or a pointer to a struct, got %T", stepDefinitionsType)
+	}
+
 	r.supportedSpecialArgs[r.suiteType] = func(runner *scenarioRunner) interface{} {
 		return runner.s
 	}
 
-	addHook := func(hooks *[]*stepDef, method reflect.Method) {
-		def := r.newStepDefOrHook(r.topLevelT, nil, method.Func)
-		if def.usesRapid() {
-			r.hooksUseRapid = true
-		}
-		*hooks = append(*hooks, def)
-	}
-
 	if before, ok := r.suiteType.MethodByName("Before"); ok {
-		addHook(&r.beforeHooks, before)
+		r.addHook(&r.beforeHooks, before.Func)
 	}
 
 	if after, ok := r.suiteType.MethodByName("After"); ok {
-		addHook(&r.afterHooks, after)
+		r.addHook(&r.afterHooks, after.Func)
 	}
 
 	if beforeStep, ok := r.suiteType.MethodByName("BeforeStep"); ok {
-		addHook(&r.beforeStepHooks, beforeStep)
+		r.addHook(&r.beforeStepHooks, beforeStep.Func)
 	}
 
 	if afterStep, ok := r.suiteType.MethodByName("AfterStep"); ok {
-		addHook(&r.afterStepHooks, afterStep)
+		r.addHook(&r.afterStepHooks, afterStep.Func)
 	}
-}
 
-// StepDefinitions is a dummy interface to mark a struct containing step definitions.
-type StepDefinitions interface{}
+	return r
+}
 
 var rapidTType = reflect.TypeOf(&rapid.T{})
