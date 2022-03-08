@@ -2,8 +2,7 @@
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/aaronc/gocuke.svg)](https://pkg.go.dev/github.com/aaronc/gocuke)
 
-`gocuke` is a Gherkin-based BDD testing library for golang. It is inspired by
-[godog](https://github.com/cucumber/godog) and [gobdd](https://github.com/go-bdd/gobdd).
+`gocuke` is a Gherkin-based BDD testing library for golang. 
 
 ## Features
 
@@ -21,12 +20,14 @@
 
 ## Why another golang BDD library?
 
-I tried godog and gobdd and wanted a specific developer UX that
+`gocuke` is inspired by
+[godog](https://github.com/cucumber/godog) and [gobdd](https://github.com/go-bdd/gobdd).
+I tried both of these libraries and wanted a specific developer UX that
 I couldn't achieve with either. godog was not a good fit for the same reasons
 as that gobdd was created (specifically tight integration with `*testing.T`).
 Looking at the source code for gobdd, it wasn't that complex but needed to
 be updated to a new versions of cucumber/gherkin-go and cucumber/messages-go
-which was basically a complete rewrite anyway.
+which was basically a complete rewrite.
 
 ## Quick Start
 
