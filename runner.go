@@ -22,6 +22,7 @@ type Runner struct {
 	afterHooks           []*stepDef
 	beforeStepHooks      []*stepDef
 	afterStepHooks       []*stepDef
+	hooksUseRapid        bool
 }
 
 // NewRunner constructs a new Runner with the provided initScenario function.
@@ -34,6 +35,7 @@ func NewRunner(t *testing.T, initScenario func(t TestingT) StepDefinitions) *Run
 	r := &Runner{
 		topLevelT:   t,
 		incr:        &messages.Incrementing{},
+		parallel:    false,
 		suggestions: map[string]methodSig{},
 		supportedSpecialArgs: map[reflect.Type]specialArgGetter{
 			// TestingT
@@ -53,6 +55,7 @@ func NewRunner(t *testing.T, initScenario func(t TestingT) StepDefinitions) *Run
 				return scenario{runner.pickle}
 			},
 		},
+		hooksUseRapid: false,
 	}
 
 	r.setupSuite(initScenario)
@@ -68,20 +71,28 @@ func (r *Runner) setupSuite(initScenario func(t TestingT) StepDefinitions) {
 		return runner.s
 	}
 
+	addHook := func(hooks *[]*stepDef, method reflect.Method) {
+		def := r.newStepDefOrHook(r.topLevelT, nil, method.Func)
+		if def.usesRapid() {
+			r.hooksUseRapid = true
+		}
+		*hooks = append(*hooks, def)
+	}
+
 	if before, ok := r.suiteType.MethodByName("Before"); ok {
-		r.beforeHooks = append(r.beforeHooks, r.newStepDefOrHook(r.topLevelT, nil, before.Func))
+		addHook(&r.beforeHooks, before)
 	}
 
 	if after, ok := r.suiteType.MethodByName("After"); ok {
-		r.afterHooks = append(r.afterHooks, r.newStepDefOrHook(r.topLevelT, nil, after.Func))
+		addHook(&r.afterHooks, after)
 	}
 
 	if beforeStep, ok := r.suiteType.MethodByName("BeforeStep"); ok {
-		r.beforeStepHooks = append(r.beforeStepHooks, r.newStepDefOrHook(r.topLevelT, nil, beforeStep.Func))
+		addHook(&r.beforeStepHooks, beforeStep)
 	}
 
 	if afterStep, ok := r.suiteType.MethodByName("AfterStep"); ok {
-		r.afterStepHooks = append(r.afterStepHooks, r.newStepDefOrHook(r.topLevelT, nil, afterStep.Func))
+		addHook(&r.afterStepHooks, afterStep)
 	}
 }
 

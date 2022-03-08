@@ -97,3 +97,12 @@ func (r *Runner) newStepDefOrHook(t *testing.T, exp *regexp.Regexp, f reflect.Va
 
 	return def
 }
+
+func (s stepDef) usesRapid() bool {
+	for _, arg := range s.specialArgs {
+		if arg.typ == rapidTType {
+			return true
+		}
+	}
+	return false
+}

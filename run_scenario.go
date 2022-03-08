@@ -18,16 +18,13 @@ func (r *docRunner) runScenario(t *testing.T, pickle *messages.Pickle) {
 		return
 	}
 
-	haveRapid := false
-	for _, def := range stepDefs {
-		for _, arg := range def.specialArgs {
-			if arg.typ == rapidTType {
-				haveRapid = true
+	useRapid := r.hooksUseRapid
+	if !useRapid {
+		for _, def := range stepDefs {
+			if def.usesRapid() {
+				useRapid = true
 				break
 			}
-		}
-		if haveRapid {
-			break
 		}
 	}
 
@@ -38,7 +35,7 @@ func (r *docRunner) runScenario(t *testing.T, pickle *messages.Pickle) {
 			t.Parallel()
 		}
 
-		if haveRapid {
+		if useRapid {
 			rapid.Check(t, func(t *rapid.T) {
 				(&scenarioRunner{
 					docRunner: r,

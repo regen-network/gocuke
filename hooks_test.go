@@ -42,6 +42,7 @@ func (s *hooksSuite) ItIsOpen() {
 }
 
 func (s *hooksSuite) ExpectScenarioName(a string) {
+	assert.Assert(s, s.scenario != nil)
 	assert.Equal(s, a, s.scenario.Name())
 }
 

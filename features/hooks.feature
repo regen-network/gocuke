@@ -1,4 +1,4 @@
-Feature: cleanup
+Feature: hooks
 
   @foo
   Scenario: regular test
