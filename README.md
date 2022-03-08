@@ -117,3 +117,69 @@ func (s *suite) IHaveLeft(a int64) {
 ```
 
 Your tests should now pass!
+
+# Usage Details
+
+## Custom options
+
+Custom `.feature` search paths can be set using the `Runner.WithPath()` method.
+
+Custom step definitions (not auto-discovered on suites) can be added
+using the `Runner.Step()` method. The suite must still be the first argument
+in all step definitions.
+
+Parallel tests can be disabled using `Runner.NonParallel()`.
+
+## Supported Param Types
+
+`gocuke` supports the following parameter types:
+* `string`
+* `int64`
+* `*big.Int`
+* `*apd.Decimal`
+
+`float64` support is not planned because it is lossy!!
+
+## Doc Strings and Data Tables
+
+`gocuke.DocString` or `gocuke.DataTable` should be used as the last argument
+in a step definition if the step uses a doc string or data table.
+
+## Property-based testing using Rapid
+
+Property-based tests using https://github.com/flyingmutant/rapid can be
+enabled by using `*rapid.T` as the first argument of test methods (after the
+suite receiver argument). Property-based test cases will be run as many times
+is rapid is configured to run tests.
+
+Example:
+```gherkin
+Scenario: any int64 value
+  Given any int64 string
+  When when I convert it to an int64
+  Then I get back the original value
+```
+
+```go
+type suite struct {
+  TestingT
+  
+  x, parsed   int64
+  str    string
+}
+
+func (s *valuesSuite) AnyInt64String(t *rapid.T) {
+	s.x = rapid.Int64().Draw(t, "x").(int64)
+	s.str = fmt.Sprintf("%d", s.x)
+}
+
+func (s *valuesSuite) WhenIConvertItToAnInt64() {
+  s.parsed = toInt64(s, s.str)
+}
+
+
+func (s *suite) IGetBackTheOriginalValue() {
+  assert.Equal(s, s.x, s.parsed)
+}
+```
+
