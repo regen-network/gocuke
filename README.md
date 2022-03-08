@@ -127,11 +127,12 @@ Your tests should now pass!
 
 ### Custom options
 
-* custom `.feature` search paths can be set using the `Runner.WithPath()` method.
-* custom step definitions (not auto-discovered on suites) can be added
-using the `Runner.Step()` method. The suite must still be the first argument
-in all step definitions.
-* parallel tests can be disabled using `Runner.NonParallel()`.
+`Runner` has the following methods for setting custom options
+
+* `WithPath()` sets custom paths. The default is `features/*.feature`.
+* `Step()` can be used to add custom steps with special regular expressions.
+  The first argument of custom step definitions must still be the suite.
+* `NonParallel()` disables parallel tests.
 
 ### Supported Param Types
 

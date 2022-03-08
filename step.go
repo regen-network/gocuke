@@ -52,6 +52,8 @@ func newStepDef(t TestingT, suiteType reflect.Type, exp *regexp.Regexp, f reflec
 // parameter arguments next (with string, int64, *big.Int, and *apd.Decimal
 // as valid parameter values) and gocuke.DocString or gocuke.DataTable
 // as the last argument if this step uses a doc string or data table respectively.
+// Custom step definitions will always take priority of auto-discovered step
+// definitions.
 func (r *Runner) Step(step interface{}, definition interface{}) *Runner {
 	exp, ok := step.(*regexp.Regexp)
 	if !ok {
