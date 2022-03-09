@@ -128,7 +128,8 @@ Your tests should now pass!
 
 ### Step Argument Types
 
-`gocuke` supports the following parameter types:
+`gocuke` supports the following step argument types for arguments captured
+from steps:
 * `string`
 * `int64`
 * `*big.Int`
@@ -139,9 +140,10 @@ Your tests should now pass!
 ### Doc Strings and Data Tables
 
 `gocuke.DocString` or `gocuke.DataTable` should be used as the last argument
-in a step definition if the step uses a doc string or data table.
+in a step definition if the step uses a doc string or data table. `gocuke.DataTable`
+provides useful helper methods for working with data tables.
 
-### Special Step Arguments
+### Special Step Argument Types
 
 The following special argument types are supported:
 * `gocuke.TestingT`
@@ -154,8 +156,24 @@ suite type if there are exported fields defined with these types.
 ### Hooks Methods
 
 If the methods `Before`, `After`, `BeforeStep`, or `AfterStep` are defined
-on the suite, they will be registered as hooks. `After`  and `AfterStep`
-methods will always be called even when tests fail.
+on the suite, they will be registered as hooks. `After`  will always be called
+even when tests fail. `AfterStep` will always be called whenever a step
+started and failed.
+
+It is generally not recommended to over-use hooks. `Before` should primarily be
+used for setting up generic resources and `After` should be used for cleaning up
+resources. `Given` and `Background` steps should generally be used for setting
+up specific test conditions. `BeforeStep` and `AfterStep` should only be used
+in very special circumstances.
+
+### Tag Expressions
+
+Cucumber [tag expressions](https://cucumber.io/docs/cucumber/api/#tag-expressions)
+can be used for selecting a subset of tests to run. The command-line
+option `-gocuke.tags` can be used to specify a subset of tests to run.
+
+The `Runner.Tags()` method can be used to select a set of tags to run in unit
+tests. `Runner.ShortTags` method can be used to select a set of tags to
 
 ### Custom options
 
@@ -164,6 +182,7 @@ methods will always be called even when tests fail.
 * `Path()` sets custom paths. The default is `features/*.feature`.
 * `Step()` can be used to add custom steps with special regular expressions.
 * `Before()`, `After()`, `BeforeStep()`, or and `AfterStep()` can be used to register custom hooks.
+* `Tags` and `ShortTags` can be used with tag expressions as described above.
 * `NonParallel()` disables parallel tests.
 
 ### Property-based testing using Rapid
@@ -205,5 +224,4 @@ func (s *suite) IGetBackTheOriginalValue() {
 ```
 ## Roadmap
 
-* [Tag Expressions](https://cucumber.io/docs/cucumber/api/#tag-expressions)
 * [Cucumber `message` based reporting](https://cucumber.io/docs/cucumber/reporting/)
