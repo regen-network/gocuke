@@ -2,15 +2,11 @@ package gocuke_test
 
 import (
 	"github.com/aaronc/gocuke"
-	"regexp"
 	"testing"
 )
 
 func TestSimple(t *testing.T) {
-	t.Parallel()
-	gocuke.NewRunner(t, func(t gocuke.TestingT) gocuke.StepDefinitions {
-		return &simpleSuite{TestingT: t}
-	}).Path("features/simple.feature").Run()
+	gocuke.NewRunner(t, &simpleSuite{}).Path("features/simple.feature").Run()
 }
 
 type simpleSuite struct {
@@ -32,33 +28,27 @@ func (s *simpleSuite) IHaveLeft(a int64) {
 	}
 }
 
-func TestCustomSteps(t *testing.T) {
-	t.Parallel()
-	gocuke.NewRunner(t, func(t gocuke.TestingT) gocuke.StepDefinitions {
-		return &customStepsSuite{TestingT: t}
-	}).
-		Path("features/simple.feature").
-		Step(`I have (\d+) cukes`, (*customStepsSuite).A).
-		Step(regexp.MustCompile(`I eat (\d+)`), (*customStepsSuite).B).
-		Step(`I have (\d+) left`, (*customStepsSuite).C).
-		Run()
+// test if a struct that doesn't use a pointer and a global var
+func TestSimpleNonPointer(t *testing.T) {
+	gocuke.NewRunner(t, simpleSuiteNP{}).Path("features/simple.feature").Run()
 }
 
-type customStepsSuite struct {
+var globalCukes int64
+
+type simpleSuiteNP struct {
 	gocuke.TestingT
-	cukes int64
 }
 
-func (s *customStepsSuite) A(a int64) {
-	s.cukes = a
+func (s simpleSuiteNP) IHaveCukes(a int64) {
+	globalCukes = a
 }
 
-func (s *customStepsSuite) B(a int64) {
-	s.cukes -= a
+func (s simpleSuiteNP) IEat(a int64) {
+	globalCukes -= a
 }
 
-func (s *customStepsSuite) C(a int64) {
-	if a != s.cukes {
-		s.Fatalf("expected %d cukes, have %d", a, s.cukes)
+func (s simpleSuiteNP) IHaveLeft(a int64) {
+	if a != globalCukes {
+		s.Fatalf("expected %d cukes, have %d", a, globalCukes)
 	}
 }

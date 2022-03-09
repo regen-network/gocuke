@@ -12,29 +12,46 @@ import (
 type Runner struct {
 	topLevelT            *testing.T
 	suiteType            reflect.Type
-	initScenario         func(t TestingT) StepDefinitions
 	incr                 *messages.Incrementing
 	paths                []string
 	parallel             bool
 	stepDefs             []*stepDef
 	suggestions          map[string]methodSig
 	supportedSpecialArgs map[reflect.Type]specialArgGetter
+	suiteInjectors       []*suiteInjector
 	beforeHooks          []*stepDef
 	afterHooks           []*stepDef
 	beforeStepHooks      []*stepDef
 	afterStepHooks       []*stepDef
-	hooksUseRapid        bool
+	suiteUsesRapid       bool
 	tagExpr      *tag.Expr
 	shortTagExpr *tag.Expr
 }
 
-// NewRunner constructs a new Runner with the provided initScenario function.
-// initScenario will be called for each test case returning a new suite instance
-// for each test case which can be used for sharing state between steps. It
-// is expected that the suite will retain a copy of the TestingT instance
-// for usage in each step. Complex initialization should not be done in initScenario
-// but rather with a Before hook.
-func NewRunner(t *testing.T, initScenario func(t TestingT) StepDefinitions) *Runner {
+type suiteInjector struct {
+	getValue specialArgGetter
+	field    reflect.StructField
+}
+
+// NewRunner constructs a new Runner with the provided suite type instance.
+// Suite type is expected to be a pointer to a struct or a struct.
+// A new instance of suiteType will be constructed for every scenario.
+//
+// The following special argument types will be injected into exported fields of
+// the suite type struct: TestingT, Scenario, *rapid.T.
+//
+// Methods defined on the suite type will be auto-registered as step definitions
+// if they correspond to the expected method name for a step. Method
+// parameters can start with the special argument types listed above and must
+// be followed by step argument types for each captured step argument and
+// DocString or DataTable at the end if the step uses one of these.
+// Valid step argument types are int64, string, *big.Int and *apd.Decimal.
+//
+// The methods Before, After, BeforeStep and AfterStep will be recognized
+// as hooks and can take the special argument types listed above.
+func NewRunner(t *testing.T, suiteType interface{}) *Runner {
+	t.Helper()
+
 	r := &Runner{
 		topLevelT:   t,
 		incr:        &messages.Incrementing{},
@@ -58,48 +75,62 @@ func NewRunner(t *testing.T, initScenario func(t TestingT) StepDefinitions) *Run
 				return scenario{runner.pickle}
 			},
 		},
-		hooksUseRapid: false,
+		suiteUsesRapid: false,
 	}
 
-	r.setupSuite(initScenario)
+	r.registerSuite(suiteType)
 
 	return r
 }
 
-func (r *Runner) setupSuite(initScenario func(t TestingT) StepDefinitions) {
-	s := initScenario(r.topLevelT)
-	r.initScenario = initScenario
-	r.suiteType = reflect.TypeOf(s)
+func (r *Runner) registerSuite(suiteType interface{}) *Runner {
+	r.topLevelT.Helper()
+
+	typ := reflect.TypeOf(suiteType)
+	r.suiteType = typ
+	kind := typ.Kind()
+
+	suiteElemType := r.suiteType
+	if kind == reflect.Ptr {
+		suiteElemType = suiteElemType.Elem()
+	}
+
+	if suiteElemType.Kind() != reflect.Struct {
+		r.topLevelT.Fatalf("expected a struct or a pointer to a struct, got %T", suiteType)
+	}
+
+	for i := 0; i < suiteElemType.NumField(); i++ {
+		field := suiteElemType.Field(i)
+		if !field.IsExported() {
+			continue
+		}
+
+		if getter, ok := r.supportedSpecialArgs[field.Type]; ok {
+			r.suiteInjectors = append(r.suiteInjectors, &suiteInjector{getValue: getter, field: field})
+		}
+	}
+
 	r.supportedSpecialArgs[r.suiteType] = func(runner *scenarioRunner) interface{} {
 		return runner.s
 	}
 
-	addHook := func(hooks *[]*stepDef, method reflect.Method) {
-		def := r.newStepDefOrHook(r.topLevelT, nil, method.Func)
-		if def.usesRapid() {
-			r.hooksUseRapid = true
-		}
-		*hooks = append(*hooks, def)
-	}
-
 	if before, ok := r.suiteType.MethodByName("Before"); ok {
-		addHook(&r.beforeHooks, before)
+		r.addHook(&r.beforeHooks, before.Func)
 	}
 
 	if after, ok := r.suiteType.MethodByName("After"); ok {
-		addHook(&r.afterHooks, after)
+		r.addHook(&r.afterHooks, after.Func)
 	}
 
 	if beforeStep, ok := r.suiteType.MethodByName("BeforeStep"); ok {
-		addHook(&r.beforeStepHooks, beforeStep)
+		r.addHook(&r.beforeStepHooks, beforeStep.Func)
 	}
 
 	if afterStep, ok := r.suiteType.MethodByName("AfterStep"); ok {
-		addHook(&r.afterStepHooks, afterStep)
+		r.addHook(&r.afterStepHooks, afterStep.Func)
 	}
-}
 
-// StepDefinitions is a dummy interface to mark a struct containing step definitions.
-type StepDefinitions interface{}
+	return r
+}
 
 var rapidTType = reflect.TypeOf(&rapid.T{})

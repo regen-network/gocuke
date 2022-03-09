@@ -6,15 +6,18 @@ import (
 )
 
 func TestDataTable(t *testing.T) {
-	NewRunner(t, func(t TestingT) StepDefinitions {
-		return &dataTableSuite{TestingT: t}
-	}).Path("features/datatable.feature").Run()
+	NewRunner(t, &dataTableSuite{}).
+		Path("features/datatable.feature").Run()
 }
 
 type dataTableSuite struct {
 	TestingT
 	datatable DataTable
 	total     int64
+}
+
+func (d *dataTableSuite) Before(t TestingT) {
+	d.TestingT = t
 }
 
 func (s *dataTableSuite) ThisDataTable(a DataTable) {
