@@ -20,14 +20,15 @@
 
 ## Why another golang BDD library?
 
-`gocuke` is inspired by
+`gocuke` was inspired by
 [godog](https://github.com/cucumber/godog) and [gobdd](https://github.com/go-bdd/gobdd).
 I tried both of these libraries and wanted a specific developer UX that
 I couldn't achieve with either. godog was not a good fit for the same reasons
 as that gobdd was created (specifically tight integration with `*testing.T`).
-Looking at the source code for gobdd, it wasn't that complex but needed to
+Looking at the source code for gobdd, it needed to
 be updated to a new versions of cucumber/gherkin-go and cucumber/messages-go
-which was basically a complete rewrite. Happy to coordinate with the authors
+and significant changes were needed to accommodate this API. So `gocuke` was
+written. We are happy to coordinate with the authors
 of either of these libraries at some point to align on common goals.
 
 ## Quick Start
@@ -156,19 +157,9 @@ If the methods `Before`, `After`, `BeforeStep`, or `AfterStep` are defined
 on the suite, they will be registered as hooks. `After`  and `AfterStep`
 methods will always be called even when tests fail.
 
-### Tag Expression
-
-Cucumber [tag expressions](https://cucumber.io/docs/cucumber/api/#tag-expressions)
-are supporting for selecting a subset of tests to run. The command-line
-option `-gocuke.tags` can be used to specify a subset of tests to run.
-
-The `Runner.Tags()` method can be used to select a set of tags to run in unit
-tests. `Runner.ShortTags` method can be used to select a set of tags to
-run when the `-short` test flag is used.
-
 ### Custom options
 
-`Runner` has the following methods for setting custom options:
+`Runner` has the following methods for setting custom options
 
 * `Path()` sets custom paths. The default is `features/*.feature`.
 * `Step()` can be used to add custom steps with special regular expressions.
@@ -214,5 +205,5 @@ func (s *suite) IGetBackTheOriginalValue() {
 ```
 ## Roadmap
 
-* 
+* [Tag Expressions](https://cucumber.io/docs/cucumber/api/#tag-expressions)
 * [Cucumber `message` based reporting](https://cucumber.io/docs/cucumber/reporting/)
