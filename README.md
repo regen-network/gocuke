@@ -20,14 +20,15 @@
 
 ## Why another golang BDD library?
 
-`gocuke` is inspired by
+`gocuke` was inspired by
 [godog](https://github.com/cucumber/godog) and [gobdd](https://github.com/go-bdd/gobdd).
 I tried both of these libraries and wanted a specific developer UX that
 I couldn't achieve with either. godog was not a good fit for the same reasons
 as that gobdd was created (specifically tight integration with `*testing.T`).
-Looking at the source code for gobdd, it wasn't that complex but needed to
+Looking at the source code for gobdd, it needed to
 be updated to a new versions of cucumber/gherkin-go and cucumber/messages-go
-which was basically a complete rewrite. Happy to coordinate with the authors
+and significant changes were needed to accommodate this API. So `gocuke` was
+written. We are happy to coordinate with the authors
 of either of these libraries at some point to align on common goals.
 
 ## Quick Start
@@ -63,12 +64,12 @@ import (
 )
 
 func TestMinimal(t *testing.T) {
-	gocuke.NewRunner(t, func(t gocuke.TestingT) gocuke.Suite {
-		return &suite{TestingT: t}
-	}).Run()
+	// a new step definition suite is constructed for every scenario
+	gocuke.NewRunner(t, &suite{}).Run()
 }
 
 type suite struct {
+	// special arguments like TestingT are injected automatically into exported fields
 	gocuke.TestingT
 }
 ```
@@ -125,15 +126,6 @@ Your tests should now pass!
 
 ## Usage Details
 
-### Custom options
-
-`Runner` has the following methods for setting custom options
-
-* `WithPath()` sets custom paths. The default is `features/*.feature`.
-* `Step()` can be used to add custom steps with special regular expressions.
-  The first argument of custom step definitions must still be the suite.
-* `NonParallel()` disables parallel tests.
-
 ### Step Argument Types
 
 `gocuke` supports the following parameter types:
@@ -149,10 +141,30 @@ Your tests should now pass!
 `gocuke.DocString` or `gocuke.DataTable` should be used as the last argument
 in a step definition if the step uses a doc string or data table.
 
+### Special Step Arguments
+
+The following special argument types are supported:
+* `gocuke.TestingT`
+* `gocuke.Scenario`
+* `*rapid.T` (see Property-based testing using Rapid below)
+
+These can be used in step definitions, hooks, and will be injected into the
+suite type if there are exported fields defined with these types.
+
 ### Hooks Methods
 
-Test suites that define an `After` method will have that method called at
-the end of testing even if the test failed.
+If the methods `Before`, `After`, `BeforeStep`, or `AfterStep` are defined
+on the suite, they will be registered as hooks. `After`  and `AfterStep`
+methods will always be called even when tests fail.
+
+### Custom options
+
+`Runner` has the following methods for setting custom options
+
+* `Path()` sets custom paths. The default is `features/*.feature`.
+* `Step()` can be used to add custom steps with special regular expressions.
+* `Before()`, `After()`, `BeforeStep()`, or and `AfterStep()` can be used to register custom hooks.
+* `NonParallel()` disables parallel tests.
 
 ### Property-based testing using Rapid
 

@@ -30,13 +30,23 @@ type suiteInjector struct {
 	field    reflect.StructField
 }
 
-// NewRunner constructs a new Runner with the provided initScenario function.
-// initScenario will be called for each test case returning a new suite instance
-// for each test case which can be used for sharing state between steps. It
-// is expected that the suite will retain a copy of the TestingT instance
-// for usage in each step. Complex initialization should not be done in initScenario
-// but rather with a Before hook.
-func NewRunner(t *testing.T, stepDefinitionsType interface{}) *Runner {
+// NewRunner constructs a new Runner with the provided suite type instance.
+// Suite type is expected to be a pointer to a struct or a struct.
+// A new instance of suiteType will be constructed for every scenario.
+//
+// The following special argument types will be injected into exported fields of
+// the suite type struct: TestingT, Scenario, *rapid.T.
+//
+// Methods defined on the suite type will be auto-registered as step definitions
+// if they correspond to the expected method name for a step. Method
+// parameters can start with the special argument types listed above and must
+// be followed by step argument types for each captured step argument and
+// DocString or DataTable at the end if the step uses one of these.
+// Valid step argument types are int64, string, *big.Int and *apd.Decimal.
+//
+// The methods Before, After, BeforeStep and AfterStep will be recognized
+// as hooks and can take the special argument types listed above.
+func NewRunner(t *testing.T, suiteType interface{}) *Runner {
 	t.Helper()
 
 	r := &Runner{
@@ -65,15 +75,15 @@ func NewRunner(t *testing.T, stepDefinitionsType interface{}) *Runner {
 		suiteUsesRapid: false,
 	}
 
-	r.registerSuite(stepDefinitionsType)
+	r.registerSuite(suiteType)
 
 	return r
 }
 
-func (r *Runner) registerSuite(stepDefinitionsType interface{}) *Runner {
+func (r *Runner) registerSuite(suiteType interface{}) *Runner {
 	r.topLevelT.Helper()
 
-	typ := reflect.TypeOf(stepDefinitionsType)
+	typ := reflect.TypeOf(suiteType)
 	r.suiteType = typ
 	kind := typ.Kind()
 
@@ -83,7 +93,7 @@ func (r *Runner) registerSuite(stepDefinitionsType interface{}) *Runner {
 	}
 
 	if suiteElemType.Kind() != reflect.Struct {
-		r.topLevelT.Fatalf("expected a struct or a pointer to a struct, got %T", stepDefinitionsType)
+		r.topLevelT.Fatalf("expected a struct or a pointer to a struct, got %T", suiteType)
 	}
 
 	for i := 0; i < suiteElemType.NumField(); i++ {
