@@ -24,8 +24,8 @@ type Runner struct {
 	beforeStepHooks      []*stepDef
 	afterStepHooks       []*stepDef
 	suiteUsesRapid       bool
-	tagExpr      *tag.Expr
-	shortTagExpr *tag.Expr
+	tagExpr              *tag.Expr
+	shortTagExpr         *tag.Expr
 }
 
 type suiteInjector struct {
@@ -51,6 +51,8 @@ type suiteInjector struct {
 // as hooks and can take the special argument types listed above.
 func NewRunner(t *testing.T, suiteType interface{}) *Runner {
 	t.Helper()
+
+	initGlobalTagExpr()
 
 	r := &Runner{
 		topLevelT:   t,

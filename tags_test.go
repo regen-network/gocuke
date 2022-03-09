@@ -8,9 +8,7 @@ import (
 )
 
 func TestTags(t *testing.T) {
-	NewRunner(t, func(t TestingT) Suite {
-		return &tagsSuite{TestingT: t}
-	}).Path("features/tags.feature").Run()
+	NewRunner(t, &tagsSuite{}).Path("features/tags.feature").Run()
 }
 
 type tagsSuite struct {

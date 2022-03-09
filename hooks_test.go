@@ -7,13 +7,36 @@ import (
 )
 
 func TestHooks(t *testing.T) {
-	NewRunner(t, &hooksSuite{}).Path("features/hooks.feature").Run()
+	assert.Assert(t, !longRun)
+	assert.Assert(t, !shortRun)
+	// test tag expression
+	NewRunner(t, &hooksSuite{}).
+		Path("features/hooks.feature").
+		Tags("@long").
+		Run()
+	assert.Assert(t, longRun)
+	assert.Assert(t, !shortRun)
 
 	if open != 0 {
 		t.Fatalf("expected resource to be closed")
 	}
+
+	NewRunner(t, &hooksSuite{}).
+		Path("features/hooks.feature").
+		ShortTags("not @long").
+		Run()
+
+	assert.Assert(t, longRun)
+	assert.Assert(t, shortRun)
+
+	if open != 0 {
+		t.Fatalf("expected resource to be closed")
+	}
+
 }
 
+var longRun = false
+var shortRun = false
 var open int64 = 0
 
 type hooksSuite struct {
@@ -24,11 +47,13 @@ type hooksSuite struct {
 }
 
 func (s *hooksSuite) IOpenAResource() {
+	shortRun = true
 	s.numOpenForScenario = 1
 	open += s.numOpenForScenario
 }
 
 func (s *hooksSuite) IOpenAnyResources(t *rapid.T) {
+	longRun = true
 	s.numOpenForScenario = rapid.Int64Range(1, 100).Draw(t, "numResources").(int64)
 	open += s.numOpenForScenario
 }

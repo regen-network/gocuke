@@ -11,7 +11,10 @@ import (
 )
 
 func TestValues(t *testing.T) {
-	NewRunner(t, &valuesSuite{}).Path("features/values.feature").Run()
+	NewRunner(t, &valuesSuite{}).
+		Path("features/values.feature").
+		ShortTags("not @long").
+		Run()
 }
 
 type valuesSuite struct {
