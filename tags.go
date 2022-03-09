@@ -7,7 +7,7 @@ import (
 )
 
 var flagTags = flag.String("gocuke.tags", "",
-	"specify a cucumber tags expression to select tests to run (ex. 'not @long'")
+	"specify a cucumber tags expression to select tests to run (ex. 'not @long')")
 
 var globalTagExpr *tag.Expr
 
