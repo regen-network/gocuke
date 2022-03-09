@@ -149,7 +149,7 @@ The following special argument types are supported:
 * `gocuke.TestingT`
 * `gocuke.Scenario`
 * `gocuke.Step` (will be `nil` when used in a before hook or injected into a suite)
-* `*rapid.T` (see Property-based testing using Rapid below)
+* `*rapid.T` (see [Property-based testing using Rapid below](#property-based-testing-using-rapid))
 
 These can be used in step definitions, hooks, and will be injected into the
 suite type if there are exported fields defined with these types.
