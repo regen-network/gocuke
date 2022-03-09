@@ -38,7 +38,7 @@ type suiteInjector struct {
 // A new instance of suiteType will be constructed for every scenario.
 //
 // The following special argument types will be injected into exported fields of
-// the suite type struct: TestingT, Scenario, *rapid.T.
+// the suite type struct: TestingT, Scenario, Step, *rapid.T.
 //
 // Methods defined on the suite type will be auto-registered as step definitions
 // if they correspond to the expected method name for a step. Method

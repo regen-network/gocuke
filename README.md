@@ -148,6 +148,7 @@ provides useful helper methods for working with data tables.
 The following special argument types are supported:
 * `gocuke.TestingT`
 * `gocuke.Scenario`
+* `gocuke.Step` (will be `nil` when used in a before hook or injected into a suite)
 * `*rapid.T` (see Property-based testing using Rapid below)
 
 These can be used in step definitions, hooks, and will be injected into the

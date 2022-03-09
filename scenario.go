@@ -2,8 +2,8 @@ package gocuke
 
 import "github.com/cucumber/messages-go/v16"
 
-// Scenario is a special step argument type that can be used in a step definition
-// or hook method.
+// Scenario is a special step argument type which describes the running scenario
+// and that can be used in a step definition or hook method.
 type Scenario interface {
 	Name() string
 	Tags() []string
