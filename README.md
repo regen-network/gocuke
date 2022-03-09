@@ -1,4 +1,4 @@
-# gocuke
+# gocuke :cucumber:
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/aaronc/gocuke.svg)](https://pkg.go.dev/github.com/aaronc/gocuke)
 
