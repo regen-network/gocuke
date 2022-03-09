@@ -156,9 +156,19 @@ If the methods `Before`, `After`, `BeforeStep`, or `AfterStep` are defined
 on the suite, they will be registered as hooks. `After`  and `AfterStep`
 methods will always be called even when tests fail.
 
+### Tag Expression
+
+Cucumber [tag expressions](https://cucumber.io/docs/cucumber/api/#tag-expressions)
+are supporting for selecting a subset of tests to run. The command-line
+option `-gocuke.tags` can be used to specify a subset of tests to run.
+
+The `Runner.Tags()` method can be used to select a set of tags to run in unit
+tests. `Runner.ShortTags` method can be used to select a set of tags to
+run when the `-short` test flag is used.
+
 ### Custom options
 
-`Runner` has the following methods for setting custom options
+`Runner` has the following methods for setting custom options:
 
 * `Path()` sets custom paths. The default is `features/*.feature`.
 * `Step()` can be used to add custom steps with special regular expressions.
@@ -204,5 +214,5 @@ func (s *suite) IGetBackTheOriginalValue() {
 ```
 ## Roadmap
 
-* [Tag Expressions](https://cucumber.io/docs/cucumber/api/#tag-expressions)
+* 
 * [Cucumber `message` based reporting](https://cucumber.io/docs/cucumber/reporting/)
