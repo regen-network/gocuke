@@ -33,7 +33,7 @@ of either of these libraries at some point to align on common goals.
 
 ## Quick Start
 
-### Step 1: Define some Gherkin
+### Step 1: Write some Gherkin
 
 In a file `features/simple.feature`:
 
