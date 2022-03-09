@@ -1,4 +1,4 @@
-module github.com/aaronc/gocuke
+module github.com/regen-network/gocuke
 
 go 1.17
 

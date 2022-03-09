@@ -1,6 +1,6 @@
 # gocuke :cucumber:
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/aaronc/gocuke.svg)](https://pkg.go.dev/github.com/aaronc/gocuke)
+[![Go Reference](https://pkg.go.dev/badge/github.com/regen-network/gocuke.svg)](https://pkg.go.dev/github.com/regen-network/gocuke)
 
 `gocuke` is a Gherkin-based BDD testing library for golang. 
 
@@ -59,7 +59,7 @@ In a file simple_test.go:
 package simple
 
 import (
-	"github.com/aaronc/gocuke"
+	"github.com/regen-network/gocuke"
 	"testing"
 )
 

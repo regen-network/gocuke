@@ -1,7 +1,7 @@
 package gocuke_test
 
 import (
-	"github.com/aaronc/gocuke"
+	"github.com/regen-network/gocuke"
 	"github.com/stretchr/testify/require"
 	"regexp"
 	"testing"

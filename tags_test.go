@@ -1,7 +1,7 @@
 package gocuke
 
 import (
-	"github.com/aaronc/gocuke/internal/tag"
+	"github.com/regen-network/gocuke/internal/tag"
 	"gotest.tools/v3/assert"
 	"strings"
 	"testing"

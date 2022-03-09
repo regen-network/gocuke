@@ -3,7 +3,7 @@ package gocuke
 import (
 	"flag"
 	"fmt"
-	"github.com/aaronc/gocuke/internal/tag"
+	"github.com/regen-network/gocuke/internal/tag"
 )
 
 var flagTags = flag.String("gocuke.tags", "",
