@@ -80,6 +80,7 @@ type scenarioRunner struct {
 	s        interface{}
 	pickle   *messages.Pickle
 	stepDefs []*stepDef
+	step     *messages.PickleStep
 }
 
 func (r *scenarioRunner) runTestCase() {

@@ -76,6 +76,10 @@ func NewRunner(t *testing.T, suiteType interface{}) *Runner {
 			reflect.TypeOf((*Scenario)(nil)).Elem(): func(runner *scenarioRunner) interface{} {
 				return scenario{runner.pickle}
 			},
+			// Step
+			reflect.TypeOf((*Step)(nil)).Elem(): func(runner *scenarioRunner) interface{} {
+				return step{runner.step}
+			},
 		},
 		suiteUsesRapid: false,
 	}
@@ -109,6 +113,9 @@ func (r *Runner) registerSuite(suiteType interface{}) *Runner {
 
 		if getter, ok := r.supportedSpecialArgs[field.Type]; ok {
 			r.suiteInjectors = append(r.suiteInjectors, &suiteInjector{getValue: getter, field: field})
+			if field.Type == rapidTType {
+				r.suiteUsesRapid = true
+			}
 		}
 	}
 

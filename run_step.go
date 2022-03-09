@@ -26,6 +26,8 @@ func (r *scenarioRunner) runHook(def *stepDef) {
 func (r *scenarioRunner) runStep(step *messages.PickleStep, def *stepDef) {
 	r.t.Helper()
 
+	r.step = step
+
 	for _, hook := range r.beforeStepHooks {
 		r.runHook(hook)
 	}

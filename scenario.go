@@ -7,6 +7,7 @@ import "github.com/cucumber/messages-go/v16"
 type Scenario interface {
 	Name() string
 	Tags() []string
+	URI() string
 	private()
 }
 
@@ -26,6 +27,10 @@ func (s scenario) Tags() []string {
 		tags[i] = tag.Name
 	}
 	return tags
+}
+
+func (s scenario) URI() string {
+	return s.pickle.Uri
 }
 
 func (s scenario) private() {}

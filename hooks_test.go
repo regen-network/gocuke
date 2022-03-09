@@ -46,7 +46,8 @@ type hooksSuite struct {
 	scenario           Scenario
 }
 
-func (s *hooksSuite) IOpenAResource() {
+func (s *hooksSuite) IOpenAResource(step Step) {
+	assert.Equal(s, "I open a resource", step.Text())
 	shortRun = true
 	s.numOpenForScenario = 1
 	open += s.numOpenForScenario
@@ -58,7 +59,8 @@ func (s *hooksSuite) IOpenAnyResources(t *rapid.T) {
 	open += s.numOpenForScenario
 }
 
-func (s *hooksSuite) ItIsOpen() {
+func (s *hooksSuite) ItIsOpen(step Step) {
+	assert.Equal(s, "it is open", step.Text())
 	if open < s.numOpenForScenario {
 		s.Fatalf("expected at least %d resources to be open", s.numOpenForScenario)
 	}
