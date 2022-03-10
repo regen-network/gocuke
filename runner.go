@@ -1,7 +1,7 @@
 package gocuke
 
 import (
-	"github.com/cucumber/messages-go/v16"
+	"github.com/regen-network/gocuke/internal/reporting"
 	"github.com/regen-network/gocuke/internal/tag"
 	"pgregory.net/rapid"
 	"reflect"
@@ -12,7 +12,6 @@ import (
 type Runner struct {
 	topLevelT            *testing.T
 	suiteType            reflect.Type
-	incr                 *messages.Incrementing
 	paths                []string
 	parallel             bool
 	stepDefs             []*stepDef
@@ -26,6 +25,7 @@ type Runner struct {
 	suiteUsesRapid       bool
 	tagExpr              *tag.Expr
 	shortTagExpr         *tag.Expr
+	reporter             reporting.Reporter
 }
 
 type suiteInjector struct {
@@ -54,10 +54,11 @@ func NewRunner(t *testing.T, suiteType interface{}) *Runner {
 
 	initGlobalTagExpr()
 
+	reporter := reporting.GetReporter(t)
 	r := &Runner{
 		topLevelT:   t,
-		incr:        &messages.Incrementing{},
 		parallel:    false,
+		reporter:    reporter,
 		suggestions: map[string]methodSig{},
 		supportedSpecialArgs: map[reflect.Type]specialArgGetter{
 			// TestingT
@@ -74,7 +75,7 @@ func NewRunner(t *testing.T, suiteType interface{}) *Runner {
 			},
 			// Scenario
 			reflect.TypeOf((*Scenario)(nil)).Elem(): func(runner *scenarioRunner) interface{} {
-				return scenario{runner.pickle}
+				return scenario{runner: runner}
 			},
 			// Step
 			reflect.TypeOf((*Step)(nil)).Elem(): func(runner *scenarioRunner) interface{} {

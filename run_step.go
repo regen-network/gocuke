@@ -3,6 +3,7 @@ package gocuke
 import (
 	"github.com/cucumber/messages-go/v16"
 	"reflect"
+	"time"
 )
 
 func (r *scenarioRunner) runHook(def *stepDef) {
@@ -25,6 +26,52 @@ func (r *scenarioRunner) runHook(def *stepDef) {
 
 func (r *scenarioRunner) runStep(step *messages.PickleStep, def *stepDef) {
 	r.t.Helper()
+
+	if r.reporter != nil {
+		r.testStepId = newId()
+		started := time.Now()
+		startedTimestamp := messages.GoTimeToTimestamp(started)
+		r.reporter.Report(&messages.Envelope{TestStepStarted: &messages.TestStepStarted{
+			TestCaseStartedId: r.testCaseStartedId,
+			TestStepId:        r.testStepId,
+			Timestamp:         &startedTimestamp,
+		}})
+		defer func() {
+			finished := time.Now()
+			finishedTimestamp := messages.GoTimeToTimestamp(finished)
+			duration := messages.GoDurationToDuration(finished.Sub(started))
+			status := messages.TestStepResultStatus_PASSED
+			t, haveWrapper := r.t.(*testingTWrapper)
+			if r.t.Failed() {
+				status = messages.TestStepResultStatus_FAILED
+			} else if haveWrapper && t.skipped {
+				status = messages.TestStepResultStatus_SKIPPED
+			}
+			var errOut string
+			if haveWrapper {
+				log := t.logOut.String()
+				errOut = t.errOut.String()
+				if log != "" {
+					r.reporter.Report(&messages.Envelope{Attachment: &messages.Attachment{
+						Body:              log,
+						TestCaseStartedId: r.testCaseStartedId,
+						TestStepId:        r.testStepId,
+					}})
+				}
+			}
+			r.reporter.Report(&messages.Envelope{TestStepFinished: &messages.TestStepFinished{
+				TestCaseStartedId: r.testCaseStartedId,
+				TestStepId:        r.testStepId,
+				Timestamp:         &finishedTimestamp,
+				TestStepResult: &messages.TestStepResult{
+					Duration:      &duration,
+					Status:        status,
+					Message:       errOut,
+					WillBeRetried: false,
+				},
+			}})
+		}()
+	}
 
 	r.step = step
 
@@ -62,7 +109,7 @@ func (r *scenarioRunner) runStep(step *messages.PickleStep, def *stepDef) {
 	}
 
 	for i, match := range matches {
-		values[i+numSpecialArgs] = convertParamValue(r.t, string(match), typ.In(i+numSpecialArgs), def.funcLoc)
+		values[i+numSpecialArgs] = convertParamValue(r.t, string(match), typ.In(i+numSpecialArgs), def.funcLoc.String())
 	}
 
 	// pickleArg goes last

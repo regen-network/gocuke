@@ -2,6 +2,7 @@ package gocuke
 
 import (
 	"fmt"
+	"github.com/cucumber/messages-go/v16"
 	"gotest.tools/v3/assert"
 	"reflect"
 	"regexp"
@@ -13,12 +14,22 @@ type stepDef struct {
 	regex       *regexp.Regexp
 	theFunc     reflect.Value
 	specialArgs []*specialArg
-	funcLoc     string
+	funcLoc     *funcLoc
 }
 
 type specialArg struct {
 	typ      reflect.Type
 	getValue specialArgGetter
+}
+
+type funcLoc struct {
+	name string
+	file string
+	line int
+}
+
+func (f funcLoc) String() string {
+	return fmt.Sprintf("%s (%s:%d)", f.name, f.file, f.line)
 }
 
 type specialArgGetter func(*scenarioRunner) interface{}
@@ -56,6 +67,23 @@ func (r *Runner) addStepDef(t *testing.T, exp *regexp.Regexp, definition reflect
 
 	def := r.newStepDefOrHook(t, exp, definition)
 	r.stepDefs = append(r.stepDefs, def)
+	if r.reporter != nil {
+		r.reporter.Report(&messages.Envelope{StepDefinition: &messages.StepDefinition{
+			Id: newId(),
+			Pattern: &messages.StepDefinitionPattern{
+				Source: def.regex.String(),
+				Type:   messages.StepDefinitionPatternType_REGULAR_EXPRESSION,
+			},
+			SourceReference: &messages.SourceReference{
+				Uri: def.funcLoc.file,
+				Location: &messages.Location{
+					Line:   int64(def.funcLoc.line),
+					Column: 0,
+				},
+			},
+		}})
+	}
+
 	return def
 }
 
@@ -74,7 +102,11 @@ func (r *Runner) newStepDefOrHook(t *testing.T, exp *regexp.Regexp, f reflect.Va
 	def := &stepDef{
 		regex:   exp,
 		theFunc: f,
-		funcLoc: fmt.Sprintf("%s (%s:%d)", rfunc.Name(), file, line),
+		funcLoc: &funcLoc{
+			name: rfunc.Name(),
+			file: file,
+			line: line,
+		},
 	}
 
 	for i := 0; i < typ.NumIn(); i++ {

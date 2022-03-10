@@ -1,7 +1,9 @@
 package gocuke
 
 import (
+	"bytes"
 	"github.com/cucumber/gherkin-go/v19"
+	"github.com/cucumber/messages-go/v16"
 	"gotest.tools/v3/assert"
 	"os"
 	"path/filepath"
@@ -23,17 +25,22 @@ func (r *Runner) Run() {
 		assert.NilError(r.topLevelT, err)
 
 		for _, file := range files {
-			f, err := os.Open(file)
+			src, err := os.ReadFile(file)
 			assert.NilError(r.topLevelT, err)
-			defer func() {
-				err := f.Close()
-				if err != nil {
-					panic(err)
-				}
-			}()
+			if r.reporter != nil {
+				r.reporter.Report(&messages.Envelope{Source: &messages.Source{
+					Uri:       file,
+					Data:      string(src),
+					MediaType: messages.SourceMediaType_TEXT_X_CUCUMBER_GHERKIN_PLAIN,
+				}})
+			}
 
-			doc, err := gherkin.ParseGherkinDocument(f, r.incr.NewId)
+			doc, err := gherkin.ParseGherkinDocument(bytes.NewReader(src), newId)
 			assert.NilError(r.topLevelT, err)
+			if r.reporter != nil {
+				r.reporter.Report(&messages.Envelope{GherkinDocument: doc})
+			}
+
 			r.topLevelT.Run(doc.Feature.Name, func(t *testing.T) {
 				t.Helper()
 
