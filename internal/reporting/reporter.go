@@ -1,34 +1,35 @@
 package reporting
 
 import (
+	"bytes"
 	"encoding/json"
 	"github.com/cucumber/messages-go/v16"
-	"sync/atomic"
+	"io"
+	"os"
+	"sync"
 	"testing"
 	"time"
 )
 
-var globalReporter *reporter
+var globalReporter *topLevelReporter
 
 type Reporter interface {
 	Report(envelope *messages.Envelope)
 }
 
+type topLevelReporter struct {
+	mutex sync.Mutex
+	f     *os.File
+}
+
 type reporter struct {
+	*topLevelReporter
 	ch     chan *messages.Envelope
-	failed int32
+	writer io.Writer
 }
 
 func (r *reporter) Report(envelope *messages.Envelope) {
 	r.ch <- envelope
-}
-
-func (r *reporter) registerTest(t *testing.T) {
-	t.Cleanup(func() {
-		if t.Failed() {
-			atomic.StoreInt32(&r.failed, 1)
-		}
-	})
 }
 
 var _ Reporter = &reporter{}
@@ -36,55 +37,95 @@ var _ Reporter = &reporter{}
 func GetReporter(t *testing.T) Reporter {
 	t.Helper()
 
-	if globalReporter != nil {
-		globalReporter.registerTest(t)
-		return globalReporter
-	}
-
-	return initReporter(t)
-}
-
-func initReporter(t *testing.T) Reporter {
-	t.Helper()
-
-	writer := getWriter()
-	if writer == nil {
-		return nil
+	if globalReporter == nil {
+		if !initReporter(t) {
+			return nil
+		}
 	}
 
 	ch := make(chan *messages.Envelope, 1024)
-	globalReporter = &reporter{ch: ch}
+	writer := &bytes.Buffer{}
+	r := &reporter{
+		topLevelReporter: globalReporter,
+		ch:               ch,
+		writer:           writer,
+	}
+
+	done := make(chan bool)
+
 	go func() {
 		enc := json.NewEncoder(writer)
-		for {
-			env, more := <-ch
-			if !more {
-				break
-			}
-
+		for env := range ch {
 			err := enc.Encode(env)
 			if err != nil {
 				panic(err)
 			}
 		}
-
-		timestamp := messages.GoTimeToTimestamp(time.Now())
-		failed := atomic.LoadInt32(&globalReporter.failed) == 1
-		err := enc.Encode(&messages.Envelope{TestRunFinished: &messages.TestRunFinished{
-			Timestamp: &timestamp,
-			Success:   !failed,
-		}})
-		if err != nil {
-			panic(err)
-		}
-
-		err = writer.Close()
-		if err != nil {
-			panic(err)
-		}
+		done <- true
 	}()
 
-	globalReporter.Report(&messages.Envelope{Meta: &messages.Meta{
+	t.Cleanup(func() {
+		ch := r.ch
+		r.ch = nil
+		close(ch)
+		<-done
+
+		globalReporter.mutex.Lock()
+		defer globalReporter.mutex.Unlock()
+		_, err := globalReporter.f.Write(writer.Bytes())
+		if err != nil {
+			t.Fatalf("unexpected error %v", err)
+		}
+
+		// we don't know if this is the last test run, but we write TestRunFinished
+		// anyway, then we move the position of the writer to right before the
+		// TestRunFinished message using Seek so that a future test will overwrite
+		// this message, and the last test will have the correct value for all
+		// test suites
+		timestamp := messages.GoTimeToTimestamp(time.Now())
+		bz, err := json.Marshal(&messages.Envelope{TestRunFinished: &messages.TestRunFinished{
+			Success:   !t.Failed(),
+			Timestamp: &timestamp,
+		}})
+		if err != nil {
+			t.Fatalf("unexpected error %v", err)
+		}
+
+		_, err = globalReporter.f.Write(bz)
+		if err != nil {
+			t.Fatalf("unexpected error %v", err)
+		}
+
+		const nl = "\n"
+		_, err = globalReporter.f.Write([]byte(nl))
+		if err != nil {
+			t.Fatalf("unexpected error %v", err)
+		}
+
+		offset := int64(len(bz) + len(nl))
+		_, err = globalReporter.f.Seek(-offset, 1)
+		if err != nil {
+			t.Fatalf("unexpected error %v", err)
+		}
+	})
+
+	return r
+}
+
+func initReporter(t *testing.T) bool {
+	t.Helper()
+
+	writer := getWriter()
+	if writer == nil {
+		return false
+	}
+
+	globalReporter = &topLevelReporter{
+		mutex: sync.Mutex{},
+		f:     writer,
+	}
+	enc := json.NewEncoder(writer)
+	err := enc.Encode(&messages.Envelope{Meta: &messages.Meta{
 		ProtocolVersion: "",
 		Implementation:  nil,
 		Runtime:         nil,
@@ -92,9 +133,14 @@ func initReporter(t *testing.T) Reporter {
 		Cpu:             nil,
 		Ci:              nil,
 	}})
+	if err != nil {
+		t.Fatalf("unexpected error %v", err)
+	}
 	timestamp := messages.GoTimeToTimestamp(time.Now())
-	globalReporter.Report(&messages.Envelope{TestRunStarted: &messages.TestRunStarted{Timestamp: &timestamp}})
-	globalReporter.registerTest(t)
+	err = enc.Encode(&messages.Envelope{TestRunStarted: &messages.TestRunStarted{Timestamp: &timestamp}})
+	if err != nil {
+		t.Fatalf("unexpected error %v", err)
+	}
 
-	return globalReporter
+	return true
 }
