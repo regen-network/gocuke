@@ -142,7 +142,7 @@ func (m methodSig) methodSig() string {
 
 func (m methodSig) suggestion(suiteTypeName string) string {
 	return fmt.Sprintf(`func (s %s) %s {
-    panic("TODO")
+    panic("PENDING")
 }`,
 		suiteTypeName, m.methodSig())
 }

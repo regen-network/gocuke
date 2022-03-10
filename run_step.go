@@ -42,7 +42,11 @@ func (r *scenarioRunner) runStep(step *messages.PickleStep, def *stepDef) {
 			duration := messages.GoDurationToDuration(finished.Sub(started))
 			status := messages.TestStepResultStatus_PASSED
 			t, haveWrapper := r.t.(*testingTWrapper)
-			if r.t.Failed() {
+			panicErr := recover()
+			pending := panicErr == "PENDING"
+			if pending {
+				status = messages.TestStepResultStatus_PENDING
+			} else if r.t.Failed() {
 				status = messages.TestStepResultStatus_FAILED
 			} else if haveWrapper && t.skipped {
 				status = messages.TestStepResultStatus_SKIPPED
@@ -70,6 +74,11 @@ func (r *scenarioRunner) runStep(step *messages.PickleStep, def *stepDef) {
 					WillBeRetried: false,
 				},
 			}})
+			if pending && !*flagStrict {
+				t.Skip("PENDING")
+			} else if panicErr != nil {
+				panic(panicErr)
+			}
 		}()
 	}
 

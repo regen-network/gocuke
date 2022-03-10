@@ -1,6 +1,7 @@
 package gocuke
 
 import (
+	"fmt"
 	"github.com/cucumber/messages-go/v16"
 	"testing"
 )
@@ -22,7 +23,13 @@ func (r *Runner) findStep(t *testing.T, step *messages.PickleStep) *stepDef {
 	}
 
 	r.suggestions[sig.name] = sig
-	t.Errorf("can't find step definition for: %s", step.Text)
+
+	msg := fmt.Sprintf("can't find step definition for: %s", step.Text)
+	if *flagStrict {
+		t.Error(msg)
+	} else {
+		t.Skip(msg)
+	}
 
 	return nil
 }

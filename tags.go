@@ -13,7 +13,7 @@ var globalTagExpr *tag.Expr
 
 func initGlobalTagExpr() *tag.Expr {
 	if globalTagExpr == nil {
-		if flagTags != nil && *flagTags != "" {
+		if *flagTags != "" {
 			var err error
 			globalTagExpr, err = tag.ParseExpr(*flagTags)
 			if err != nil {

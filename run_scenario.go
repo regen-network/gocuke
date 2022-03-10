@@ -35,7 +35,11 @@ func (r *docRunner) runScenario(t *testing.T, pickle *messages.Pickle) {
 
 	stepDefs := make([]*stepDef, len(pickle.Steps))
 	for i, step := range pickle.Steps {
-		stepDefs[i] = r.findStep(t, step)
+		step := r.findStep(t, step)
+		if step == nil {
+			return
+		}
+		stepDefs[i] = step
 	}
 
 	if t.Failed() {
@@ -52,45 +56,38 @@ func (r *docRunner) runScenario(t *testing.T, pickle *messages.Pickle) {
 		}
 	}
 
-	t.Run(pickle.Name, func(t *testing.T) {
-		t.Helper()
-		if r.parallel {
-			t.Parallel()
-		}
+	var testCaseId string
+	if r.reporter != nil {
+		testCaseId = newId()
+		r.reporter.Report(&messages.Envelope{TestCase: &messages.TestCase{
+			Id:        testCaseId,
+			PickleId:  pickle.Id,
+			TestSteps: nil,
+		}})
+	}
 
-		var testCaseId string
-		if r.reporter != nil {
-			testCaseId = newId()
-			r.reporter.Report(&messages.Envelope{TestCase: &messages.TestCase{
-				Id:        testCaseId,
-				PickleId:  pickle.Id,
-				TestSteps: nil,
-			}})
-		}
-
-		if useRapid {
-			var attempt int64 = 0
-			rapid.Check(t, func(t *rapid.T) {
-				(&scenarioRunner{
-					docRunner:  r,
-					t:          t,
-					pickle:     pickle,
-					stepDefs:   stepDefs,
-					testCaseId: testCaseId,
-					attempt:    attempt,
-				}).runTestCase()
-				attempt++
-			})
-		} else {
+	if useRapid {
+		var attempt int64 = 0
+		rapid.Check(t, func(t *rapid.T) {
 			(&scenarioRunner{
 				docRunner:  r,
 				t:          t,
 				pickle:     pickle,
-				testCaseId: testCaseId,
 				stepDefs:   stepDefs,
+				testCaseId: testCaseId,
+				attempt:    attempt,
 			}).runTestCase()
-		}
-	})
+			attempt++
+		})
+	} else {
+		(&scenarioRunner{
+			docRunner:  r,
+			t:          t,
+			pickle:     pickle,
+			testCaseId: testCaseId,
+			stepDefs:   stepDefs,
+		}).runTestCase()
+	}
 }
 
 type scenarioRunner struct {
