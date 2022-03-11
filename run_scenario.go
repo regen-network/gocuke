@@ -34,12 +34,21 @@ func (r *docRunner) runScenario(t *testing.T, pickle *messages.Pickle) {
 	}
 
 	stepDefs := make([]*stepDef, len(pickle.Steps))
+	missingSteps := false
 	for i, step := range pickle.Steps {
 		step := r.findStep(t, step)
 		if step == nil {
-			return
+			missingSteps = true
 		}
 		stepDefs[i] = step
+	}
+
+	if missingSteps {
+		if *flagStrict {
+			t.FailNow()
+		} else {
+			t.SkipNow()
+		}
 	}
 
 	if t.Failed() {

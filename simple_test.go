@@ -18,9 +18,10 @@ func (s *simpleSuite) IHaveCukes(a int64) {
 	s.cukes = a
 }
 
-func (s *simpleSuite) IEat(a int64) {
-	s.cukes -= a
-}
+//func (s *simpleSuite) IEat(a int64) {
+//	//s.cukes -= a
+//	panic("PENDING")
+//}
 
 func (s *simpleSuite) IHaveLeft(a int64) {
 	if a != s.cukes {
