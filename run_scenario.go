@@ -47,31 +47,23 @@ func (r *docRunner) runScenario(t *testing.T, pickle *messages.Pickle) {
 		}
 	}
 
-	t.Run(pickle.Name, func(t *testing.T) {
-		t.Helper()
-
-		if r.parallel {
-			t.Parallel()
-		}
-
-		if useRapid {
-			rapid.Check(t, func(t *rapid.T) {
-				(&scenarioRunner{
-					docRunner: r,
-					t:         t,
-					pickle:    pickle,
-					stepDefs:  stepDefs,
-				}).runTestCase()
-			})
-		} else {
+	if useRapid {
+		rapid.Check(t, func(t *rapid.T) {
 			(&scenarioRunner{
 				docRunner: r,
 				t:         t,
 				pickle:    pickle,
 				stepDefs:  stepDefs,
 			}).runTestCase()
-		}
-	})
+		})
+	} else {
+		(&scenarioRunner{
+			docRunner: r,
+			t:         t,
+			pickle:    pickle,
+			stepDefs:  stepDefs,
+		}).runTestCase()
+	}
 }
 
 type scenarioRunner struct {

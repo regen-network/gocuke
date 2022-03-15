@@ -78,15 +78,15 @@ When you run the tests, they should fail and suggest that you add these
 step definitions:
 ```go
 func (s *suite) IEat(a int64) {
-    panic("TODO")
+    panic("PENDING")
 }
 
 func (s *suite) IHaveLeft(a int64) {
-    panic("TODO")
+    panic("PENDING")
 }
 
 func (s *suite) IHaveCukes(a int64) {
-    panic("TODO")
+    panic("PENDING")
 }
 ```
 
