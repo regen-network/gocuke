@@ -2,7 +2,7 @@ package gocuke
 
 import (
 	"fmt"
-	"github.com/cucumber/messages-go/v16"
+	"github.com/cucumber/common/messages/go/v17"
 	"regexp"
 	"strings"
 	"unicode"

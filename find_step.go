@@ -1,7 +1,7 @@
 package gocuke
 
 import (
-	"github.com/cucumber/messages-go/v16"
+	"github.com/cucumber/common/messages/go/v17"
 	"testing"
 )
 

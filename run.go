@@ -1,7 +1,7 @@
 package gocuke
 
 import (
-	"github.com/cucumber/gherkin-go/v19"
+	gherkin "github.com/cucumber/common/gherkin/go/v22"
 	"gotest.tools/v3/assert"
 	"os"
 	"path/filepath"
