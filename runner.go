@@ -1,7 +1,7 @@
 package gocuke
 
 import (
-	"github.com/cucumber/messages-go/v16"
+	"github.com/cucumber/common/messages/go/v17"
 	"github.com/regen-network/gocuke/internal/tag"
 	"pgregory.net/rapid"
 	"reflect"

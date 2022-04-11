@@ -2,7 +2,7 @@ package gocuke
 
 import (
 	"github.com/cockroachdb/apd/v3"
-	"github.com/cucumber/messages-go/v16"
+	"github.com/cucumber/common/messages/go/v17"
 	"math/big"
 	"reflect"
 )
