@@ -88,6 +88,11 @@ func (s *suite) IHaveLeft(a int64) {
 func (s *suite) IHaveCukes(a int64) {
     panic("PENDING")
 }
+
+Steps can be manually registered with the runner for customization using this code:
+  Step(`^I\s+have\s+(-?\d+)\s+cukes$`, (*simpleSuite).IHaveCukes).
+  Step(`^I\s+eat\s+(-?\d+)$`, (*simpleSuite).IEat).
+  Step(`^I\s+have\s+(-?\d+)\s+left$`, (*simpleSuite).IHaveLeft)
 ```
 
 Copy these definitions into `simple_test.go`.
