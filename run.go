@@ -1,12 +1,13 @@
 package gocuke
 
 import (
-	gherkin "github.com/cucumber/common/gherkin/go/v22"
-	"gotest.tools/v3/assert"
 	"os"
 	"path/filepath"
 	"reflect"
 	"testing"
+
+	gherkin "github.com/cucumber/common/gherkin/go/v22"
+	"gotest.tools/v3/assert"
 )
 
 // Run runs the features registered with the runner.
@@ -56,8 +57,16 @@ func (r *Runner) Run() {
 
 		suggestionText := "Missing step definitions can be fixed with the following methods:\n"
 		for _, sig := range r.suggestions {
-			suggestionText += sig.suggestion(suiteTypeName) + "\n\n"
+			suggestionText += sig.methodSuggestion(suiteTypeName) + "\n\n"
 		}
+
+		suggestionText += "Steps can be manually registered with the runner for customization using this code:\n"
+		for _, sig := range r.suggestions {
+			suggestionText += "  " + sig.stepSuggestion(suiteTypeName) + ".\n"
+		}
+		suggestionText += "\n\n"
+		suggestionText += "See https://github.com/regen-network/gocuke for further customization options."
+
 		r.topLevelT.Logf(suggestionText)
 	}
 }

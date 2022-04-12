@@ -2,10 +2,11 @@ package gocuke
 
 import (
 	"fmt"
-	"github.com/cucumber/common/messages/go/v17"
 	"regexp"
 	"strings"
 	"unicode"
+
+	"github.com/cucumber/common/messages/go/v17"
 )
 
 func guessMethodSig(step *messages.PickleStep) methodSig {
@@ -140,11 +141,15 @@ func (m methodSig) methodSig() string {
 	return fmt.Sprintf(`%s(%s)`, m.name, strings.Join(paramNames, ", "))
 }
 
-func (m methodSig) suggestion(suiteTypeName string) string {
+func (m methodSig) methodSuggestion(suiteTypeName string) string {
 	return fmt.Sprintf(`func (s %s) %s {
     panic("PENDING")
 }`,
 		suiteTypeName, m.methodSig())
+}
+
+func (m methodSig) stepSuggestion(suiteTypeName string) string {
+	return fmt.Sprintf("Step(`%s`, (%s).%s)", m.regex.String(), suiteTypeName, m.name)
 }
 
 var decRegex = regexp.MustCompile(`^-?\d+\.\d+$`)
