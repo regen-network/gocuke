@@ -1,10 +1,11 @@
 package gocuke
 
 import (
-	"github.com/cockroachdb/apd/v3"
 	"math/big"
 	"reflect"
 	"strconv"
+
+	"github.com/cockroachdb/apd/v3"
 )
 
 func convertParamValue(t TestingT, match string, typ reflect.Type, funcLoc string) reflect.Value {

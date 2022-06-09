@@ -5,10 +5,11 @@ go 1.17
 require (
 	github.com/alecthomas/participle/v2 v2.0.0-alpha7
 	github.com/cockroachdb/apd/v3 v3.1.0
-	github.com/cucumber/common/gherkin/go/v22 v22.0.0
-	github.com/cucumber/common/messages/go/v17 v17.1.1
+	github.com/cucumber/common/gherkin/go/v24 v24.0.0-20220609092017-52f75fe6d0e1
+	github.com/cucumber/common/messages/go/v18 v18.0.0
+	github.com/cucumber/common/messages/go/v19 v19.0.0
 	github.com/google/go-cmp v0.5.5
-	github.com/stretchr/testify v1.7.0
+	github.com/stretchr/testify v1.7.1
 	gotest.tools/v3 v3.1.0
 	pgregory.net/rapid v0.4.7
 )

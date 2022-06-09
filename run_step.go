@@ -1,8 +1,9 @@
 package gocuke
 
 import (
-	"github.com/cucumber/common/messages/go/v17"
 	"reflect"
+
+	"github.com/cucumber/common/messages/go/v19"
 )
 
 func (r *scenarioRunner) runHook(def *stepDef) {
