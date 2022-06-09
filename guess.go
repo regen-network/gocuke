@@ -6,7 +6,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/cucumber/common/messages/go/v17"
+	"github.com/cucumber/common/messages/go/v19"
 )
 
 func guessMethodSig(step *messages.PickleStep) methodSig {

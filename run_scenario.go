@@ -1,11 +1,13 @@
 package gocuke
 
 import (
-	"github.com/cucumber/common/messages/go/v17"
-	"github.com/regen-network/gocuke/internal/tag"
-	"pgregory.net/rapid"
 	"reflect"
 	"testing"
+
+	"github.com/cucumber/common/messages/go/v19"
+	"pgregory.net/rapid"
+
+	"github.com/regen-network/gocuke/internal/tag"
 )
 
 func (r *docRunner) runScenario(t *testing.T, pickle *messages.Pickle) {

@@ -1,9 +1,10 @@
 package gocuke
 
 import (
-	"github.com/cucumber/common/messages/go/v17"
-	"gotest.tools/v3/assert"
 	"testing"
+
+	"github.com/cucumber/common/messages/go/v19"
+	"gotest.tools/v3/assert"
 )
 
 func TestGuessMethodSig(t *testing.T) {

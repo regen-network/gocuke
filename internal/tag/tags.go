@@ -1,6 +1,6 @@
 package tag
 
-import "github.com/cucumber/common/messages/go/v17"
+import "github.com/cucumber/common/messages/go/v19"
 
 type Tags map[string]bool
 
