@@ -174,9 +174,16 @@ in very special circumstances.
 
 ### Strict Mode
 
-When a step panic's with the string `"PENDING"` (which is how code suggestions
-get generated), gocuke will consider the test as pending, skip the test and not
-fail the test suite. To fail tests that are pending, use the command line flag
+By default, gocuke runs in non-strict mode where the following conditions
+cause tests to be skipped rather than fail:
+- there are missing step definitions
+- a step panic's with the string `"PENDING"` (which is how code suggestions
+  get generated)
+
+In these cases, gocuke will consider the test as pending, skip the test and not
+fail the test suite. 
+
+Enable strict mode and fail tests in these cases, use the command line flag
 `-gocuke.strict` with `go test`. Ex: `go test ./... -gocuke.strict`.
 
 ### Tag Expressions
