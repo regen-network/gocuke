@@ -2,12 +2,13 @@ package gocuke
 
 import (
 	"fmt"
-	"github.com/cucumber/messages-go/v16"
-	"gotest.tools/v3/assert"
 	"reflect"
 	"regexp"
 	"runtime"
 	"testing"
+
+	messages "github.com/cucumber/messages/go/v21"
+	"gotest.tools/v3/assert"
 )
 
 type stepDef struct {

@@ -14,7 +14,7 @@ var globalTagExpr tag.Evaluatable
 
 func initGlobalTagExpr() tag.Evaluatable {
 	if globalTagExpr == nil {
-		if *flagTags != "" {
+		if flagTags != nil && *flagTags != "" {
 			var err error
 			globalTagExpr, err = tag.Parse(*flagTags)
 			if err != nil {

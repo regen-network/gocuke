@@ -23,7 +23,7 @@ func (r *Runner) findStep(t *testing.T, step *messages.PickleStep) *stepDef {
 	}
 
 	r.suggestions[sig.name] = sig
+	t.Errorf("can't find step definition for: %s", step.Text)
 
-	t.Logf("can't find step definition for: %s", step.Text)
 	return nil
 }

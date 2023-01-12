@@ -3,12 +3,13 @@ package reporting
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/cucumber/messages-go/v16"
 	"io"
 	"os"
 	"sync"
 	"testing"
 	"time"
+
+	messages "github.com/cucumber/messages/go/v21"
 )
 
 var globalReporter *topLevelReporter

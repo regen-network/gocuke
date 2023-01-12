@@ -3,12 +3,12 @@ package gocuke
 import (
 	"reflect"
 	"testing"
+	"time"
 
 	messages "github.com/cucumber/messages/go/v21"
 	"pgregory.net/rapid"
 
 	"github.com/regen-network/gocuke/internal/tag"
-	"time"
 )
 
 func (r *docRunner) runScenario(t *testing.T, pickle *messages.Pickle) {
@@ -46,11 +46,7 @@ func (r *docRunner) runScenario(t *testing.T, pickle *messages.Pickle) {
 	}
 
 	if missingSteps {
-		if *flagStrict {
-			t.FailNow()
-		} else {
-			t.SkipNow()
-		}
+		t.FailNow()
 	}
 
 	if t.Failed() {
@@ -97,23 +93,6 @@ func (r *docRunner) runScenario(t *testing.T, pickle *messages.Pickle) {
 			pickle:     pickle,
 			testCaseId: testCaseId,
 			stepDefs:   stepDefs,
-		}).runTestCase()
-	}
-	if useRapid {
-		rapid.Check(t, func(t *rapid.T) {
-			(&scenarioRunner{
-				docRunner: r,
-				t:         t,
-				pickle:    pickle,
-				stepDefs:  stepDefs,
-			}).runTestCase()
-		})
-	} else {
-		(&scenarioRunner{
-			docRunner: r,
-			t:         t,
-			pickle:    pickle,
-			stepDefs:  stepDefs,
 		}).runTestCase()
 	}
 }

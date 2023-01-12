@@ -2,17 +2,16 @@ package gocuke
 
 import (
 	"bytes"
-	"github.com/cucumber/gherkin-go/v19"
-	"github.com/cucumber/messages-go/v16"
-	"gotest.tools/v3/assert"
 	"os"
 	"path/filepath"
 	"reflect"
 	"strings"
 	"testing"
 
-	gherkin "github.com/cucumber/gherkin/go/v26"
+	messages "github.com/cucumber/messages/go/v21"
 	"gotest.tools/v3/assert"
+
+	gherkin "github.com/cucumber/gherkin/go/v26"
 )
 
 // Run runs the features registered with the runner.
@@ -42,6 +41,7 @@ func (r *Runner) Run() {
 		for _, file := range files {
 			src, err := os.ReadFile(file)
 			assert.NilError(r.topLevelT, err)
+
 			if r.reporter != nil {
 				r.reporter.Report(&messages.Envelope{Source: &messages.Source{
 					Uri:       file,

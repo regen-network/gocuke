@@ -75,18 +75,13 @@ func (r *scenarioRunner) runStep(step *messages.PickleStep, def *stepDef) {
 				TestStepId:        r.testStepId,
 				Timestamp:         &finishedTimestamp,
 				TestStepResult: &messages.TestStepResult{
-					Duration:      &duration,
-					Status:        status,
-					Message:       errOut,
-					WillBeRetried: false,
+					Duration: &duration,
+					Status:   status,
+					Message:  errOut,
 				},
 			}})
 			if pending {
-				if *flagStrict {
-					t.Error("PENDING")
-				} else {
-					t.Skip("PENDING")
-				}
+				t.Error("PENDING")
 			}
 		}()
 	}
