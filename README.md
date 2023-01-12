@@ -172,6 +172,13 @@ resources. `Given` and `Background` steps should generally be used for setting
 up specific test conditions. `BeforeStep` and `AfterStep` should only be used
 in very special circumstances.
 
+### Strict Mode
+
+When a step panic's with the string `"PENDING"` (which is how code suggestions
+get generated), gocuke will consider the test as pending, skip the test and not
+fail the test suite. To fail tests that are pending, use the command line flag
+`-gocuke.strict` with `go test`. Ex: `go test ./... -gocuke.strict`.
+
 ### Tag Expressions
 
 Cucumber [tag expressions](https://cucumber.io/docs/cucumber/api/#tag-expressions)
