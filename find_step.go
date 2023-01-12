@@ -1,8 +1,9 @@
 package gocuke
 
 import (
-	"github.com/cucumber/messages-go/v16"
 	"testing"
+
+	messages "github.com/cucumber/messages/go/v21"
 )
 
 func (r *Runner) findStep(t *testing.T, step *messages.PickleStep) *stepDef {

@@ -1,9 +1,10 @@
 package gocuke
 
 import (
-	"github.com/cucumber/messages-go/v16"
 	"reflect"
 	"time"
+
+	messages "github.com/cucumber/messages/go/v21"
 )
 
 func (r *scenarioRunner) runHook(def *stepDef) {

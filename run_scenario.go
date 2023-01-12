@@ -1,11 +1,13 @@
 package gocuke
 
 import (
-	"github.com/cucumber/messages-go/v16"
-	"github.com/regen-network/gocuke/internal/tag"
-	"pgregory.net/rapid"
 	"reflect"
 	"testing"
+
+	messages "github.com/cucumber/messages/go/v21"
+	"pgregory.net/rapid"
+
+	"github.com/regen-network/gocuke/internal/tag"
 	"time"
 )
 
@@ -17,18 +19,18 @@ func (r *docRunner) runScenario(t *testing.T, pickle *messages.Pickle) {
 	}
 
 	tags := tag.NewTagsFromPickleTags(pickle.Tags)
-	if r.tagExpr != nil && !r.tagExpr.Match(tags) {
+	if r.tagExpr != nil && !tags.Match(r.tagExpr) {
 		t.SkipNow()
 	}
 
 	if testing.Short() {
-		if r.shortTagExpr != nil && !r.shortTagExpr.Match(tags) {
+		if r.shortTagExpr != nil && !tags.Match(r.shortTagExpr) {
 			t.SkipNow()
 		}
 	}
 
 	if globalTagExpr != nil {
-		if !globalTagExpr.Match(tags) {
+		if !tags.Match(globalTagExpr) {
 			t.SkipNow()
 		}
 	}
@@ -95,6 +97,23 @@ func (r *docRunner) runScenario(t *testing.T, pickle *messages.Pickle) {
 			pickle:     pickle,
 			testCaseId: testCaseId,
 			stepDefs:   stepDefs,
+		}).runTestCase()
+	}
+	if useRapid {
+		rapid.Check(t, func(t *rapid.T) {
+			(&scenarioRunner{
+				docRunner: r,
+				t:         t,
+				pickle:    pickle,
+				stepDefs:  stepDefs,
+			}).runTestCase()
+		})
+	} else {
+		(&scenarioRunner{
+			docRunner: r,
+			t:         t,
+			pickle:    pickle,
+			stepDefs:  stepDefs,
 		}).runTestCase()
 	}
 }

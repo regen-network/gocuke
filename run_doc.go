@@ -1,9 +1,10 @@
 package gocuke
 
 import (
-	"github.com/cucumber/gherkin-go/v19"
-	"github.com/cucumber/messages-go/v16"
 	"testing"
+
+	gherkin "github.com/cucumber/gherkin/go/v26"
+	messages "github.com/cucumber/messages/go/v21"
 )
 
 type docRunner struct {

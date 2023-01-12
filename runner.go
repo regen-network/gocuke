@@ -6,6 +6,10 @@ import (
 	"pgregory.net/rapid"
 	"reflect"
 	"testing"
+
+	"github.com/cucumber/common/messages/go/v19"
+	tag "github.com/cucumber/tag-expressions/go/v5"
+	"pgregory.net/rapid"
 )
 
 // Runner is a test runner.
@@ -26,6 +30,8 @@ type Runner struct {
 	tagExpr              *tag.Expr
 	shortTagExpr         *tag.Expr
 	reporter             reporting.Reporter
+	tagExpr              tag.Evaluatable
+	shortTagExpr         tag.Evaluatable
 }
 
 type suiteInjector struct {

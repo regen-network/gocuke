@@ -8,7 +8,11 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"strings"
 	"testing"
+
+	gherkin "github.com/cucumber/gherkin/go/v26"
+	"gotest.tools/v3/assert"
 )
 
 // Run runs the features registered with the runner.
@@ -20,9 +24,20 @@ func (r *Runner) Run() {
 		paths = []string{"features/*.feature"}
 	}
 
+	haveTests := false
+
 	for _, path := range paths {
-		files, err := filepath.Glob(path)
-		assert.NilError(r.topLevelT, err)
+		var files []string
+		// use glob paths if we have a * in the path
+		// if we don't have a glob just check the path directly
+		// not doing this allows mis-spellings in exact paths to be skipped silently
+		if strings.Contains(path, "*") {
+			var err error
+			files, err = filepath.Glob(path)
+			assert.NilError(r.topLevelT, err)
+		} else {
+			files = []string{path}
+		}
 
 		for _, file := range files {
 			src, err := os.ReadFile(file)
@@ -34,6 +49,8 @@ func (r *Runner) Run() {
 					MediaType: messages.SourceMediaType_TEXT_X_CUCUMBER_GHERKIN_PLAIN,
 				}})
 			}
+
+			haveTests = true
 
 			doc, err := gherkin.ParseGherkinDocument(bytes.NewReader(src), newId)
 			assert.NilError(r.topLevelT, err)
@@ -63,8 +80,20 @@ func (r *Runner) Run() {
 
 		suggestionText := "Missing step definitions can be fixed with the following methods:\n"
 		for _, sig := range r.suggestions {
-			suggestionText += sig.suggestion(suiteTypeName) + "\n\n"
+			suggestionText += sig.methodSuggestion(suiteTypeName) + "\n\n"
 		}
+
+		suggestionText += "Steps can be manually registered with the runner for customization using this code:\n"
+		for _, sig := range r.suggestions {
+			suggestionText += "  " + sig.stepSuggestion(suiteTypeName) + ".\n"
+		}
+		suggestionText += "\n\n"
+		suggestionText += "See https://github.com/regen-network/gocuke for further customization options."
+
 		r.topLevelT.Logf(suggestionText)
+	}
+
+	if !haveTests {
+		r.topLevelT.Fatalf("no tests found in paths: %v", r.paths)
 	}
 }
