@@ -1,10 +1,13 @@
 package gocuke
 
 import (
-	"github.com/regen-network/gocuke/internal/tag"
-	"gotest.tools/v3/assert"
 	"strings"
 	"testing"
+
+	tagexpressions "github.com/cucumber/tag-expressions/go/v5"
+	"gotest.tools/v3/assert"
+
+	"github.com/regen-network/gocuke/internal/tag"
 )
 
 func TestTags(t *testing.T) {
@@ -13,7 +16,7 @@ func TestTags(t *testing.T) {
 
 type tagsSuite struct {
 	TestingT
-	expr *tag.Expr
+	expr tagexpressions.Evaluatable
 	tags []string
 }
 
@@ -31,7 +34,7 @@ func (s *tagsSuite) IEatOtherCukes() {
 
 func (s *tagsSuite) TheTagExpression(a DocString) {
 	var err error
-	s.expr, err = tag.ParseExpr(a.Content)
+	s.expr, err = tagexpressions.Parse(a.Content)
 	assert.NilError(s, err, a.Content)
 }
 
@@ -40,7 +43,7 @@ func (s *tagsSuite) IMatch(a string) {
 }
 
 func (s *tagsSuite) TheResultIs(a string) {
-	res := s.expr.Match(tag.NewTags(s.tags...))
+	res := tag.NewTags(s.tags...).Match(s.expr)
 	switch a {
 	case "true":
 		assert.Assert(s, res)

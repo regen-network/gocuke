@@ -1,11 +1,12 @@
 package gocuke
 
 import (
-	"github.com/cucumber/common/messages/go/v17"
-	"github.com/regen-network/gocuke/internal/tag"
-	"pgregory.net/rapid"
 	"reflect"
 	"testing"
+
+	"github.com/cucumber/common/messages/go/v17"
+	tag "github.com/cucumber/tag-expressions/go/v5"
+	"pgregory.net/rapid"
 )
 
 // Runner is a test runner.
@@ -24,8 +25,8 @@ type Runner struct {
 	beforeStepHooks      []*stepDef
 	afterStepHooks       []*stepDef
 	suiteUsesRapid       bool
-	tagExpr              *tag.Expr
-	shortTagExpr         *tag.Expr
+	tagExpr              tag.Evaluatable
+	shortTagExpr         tag.Evaluatable
 }
 
 type suiteInjector struct {
