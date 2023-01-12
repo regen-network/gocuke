@@ -14,18 +14,18 @@ func (r *docRunner) runScenario(t *testing.T, pickle *messages.Pickle) {
 	t.Helper()
 
 	tags := tag.NewTagsFromPickleTags(pickle.Tags)
-	if r.tagExpr != nil && !r.tagExpr.Match(tags) {
+	if r.tagExpr != nil && !tags.Match(r.tagExpr) {
 		t.SkipNow()
 	}
 
 	if testing.Short() {
-		if r.shortTagExpr != nil && !r.shortTagExpr.Match(tags) {
+		if r.shortTagExpr != nil && !tags.Match(r.shortTagExpr) {
 			t.SkipNow()
 		}
 	}
 
 	if globalTagExpr != nil {
-		if !globalTagExpr.Match(tags) {
+		if !tags.Match(globalTagExpr) {
 			t.SkipNow()
 		}
 	}
