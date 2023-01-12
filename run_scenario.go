@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/cucumber/common/messages/go/v17"
+	messages "github.com/cucumber/messages/go/v21"
 	"pgregory.net/rapid"
 
 	"github.com/regen-network/gocuke/internal/tag"

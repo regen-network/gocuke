@@ -4,8 +4,9 @@ go 1.17
 
 require (
 	github.com/cockroachdb/apd/v3 v3.1.0
-	github.com/cucumber/common/gherkin/go/v22 v22.0.0
-	github.com/cucumber/common/messages/go/v17 v17.1.1
+	github.com/cucumber/common/messages/go/v19 v19.1.2
+	github.com/cucumber/gherkin/go/v26 v26.0.3
+	github.com/cucumber/messages/go/v21 v21.0.1
 	github.com/cucumber/tag-expressions/go/v5 v5.0.1
 	github.com/google/go-cmp v0.5.5
 	github.com/stretchr/testify v1.8.1

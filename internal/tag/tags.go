@@ -1,9 +1,8 @@
 package tag
 
-import (
-	messages "github.com/cucumber/common/messages/go/v17"
-	tag "github.com/cucumber/tag-expressions/go/v5"
-)
+import messages "github.com/cucumber/messages/go/v21"
+
+type Tags map[string]bool
 
 func NewTags(tags ...string) Tags {
 	have := map[string]bool{}

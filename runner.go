@@ -4,9 +4,10 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/cucumber/common/messages/go/v17"
-	tag "github.com/cucumber/tag-expressions/go/v5"
+	"github.com/cucumber/common/messages/go/v19"
 	"pgregory.net/rapid"
+
+	"github.com/regen-network/gocuke/internal/tag"
 )
 
 // Runner is a test runner.

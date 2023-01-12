@@ -1,10 +1,11 @@
 package gocuke
 
 import (
-	"github.com/cockroachdb/apd/v3"
-	"github.com/cucumber/common/messages/go/v17"
 	"math/big"
 	"reflect"
+
+	"github.com/cockroachdb/apd/v3"
+	messages "github.com/cucumber/messages/go/v21"
 )
 
 // DataTable wraps a data table step argument
