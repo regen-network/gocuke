@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"strings"
 	"testing"
 
 	gherkin "github.com/cucumber/gherkin/go/v26"
@@ -19,9 +20,20 @@ func (r *Runner) Run() {
 		paths = []string{"features/*.feature"}
 	}
 
+	haveTests := false
+
 	for _, path := range paths {
-		files, err := filepath.Glob(path)
-		assert.NilError(r.topLevelT, err)
+		var files []string
+		// use glob paths if we have a * in the path
+		// if we don't have a glob just check the path directly
+		// not doing this allows mis-spellings in exact paths to be skipped silently
+		if strings.Contains(path, "*") {
+			var err error
+			files, err = filepath.Glob(path)
+			assert.NilError(r.topLevelT, err)
+		} else {
+			files = []string{path}
+		}
 
 		for _, file := range files {
 			f, err := os.Open(file)
@@ -32,6 +44,8 @@ func (r *Runner) Run() {
 					panic(err)
 				}
 			}()
+
+			haveTests = true
 
 			doc, err := gherkin.ParseGherkinDocument(f, r.incr.NewId)
 			assert.NilError(r.topLevelT, err)
@@ -68,5 +82,9 @@ func (r *Runner) Run() {
 		suggestionText += "See https://github.com/regen-network/gocuke for further customization options."
 
 		r.topLevelT.Logf(suggestionText)
+	}
+
+	if !haveTests {
+		r.topLevelT.Fatalf("no tests found in paths: %v", r.paths)
 	}
 }
