@@ -3,19 +3,20 @@ package gocuke
 import (
 	"flag"
 	"fmt"
-	"github.com/regen-network/gocuke/internal/tag"
+
+	tag "github.com/cucumber/tag-expressions/go/v5"
 )
 
 var flagTags = flag.String("gocuke.tags", "",
 	"specify a cucumber tags expression to select tests to run (ex. 'not @long')")
 
-var globalTagExpr *tag.Expr
+var globalTagExpr tag.Evaluatable
 
-func initGlobalTagExpr() *tag.Expr {
+func initGlobalTagExpr() tag.Evaluatable {
 	if globalTagExpr == nil {
 		if flagTags != nil && *flagTags != "" {
 			var err error
-			globalTagExpr, err = tag.ParseExpr(*flagTags)
+			globalTagExpr, err = tag.Parse(*flagTags)
 			if err != nil {
 				if err != nil {
 					panic(fmt.Errorf("error parsing tag expression %q: %v\n", *flagTags, err))
@@ -32,7 +33,7 @@ func initGlobalTagExpr() *tag.Expr {
 // in parentheses to allow expressions like "(@smoke or @ui) and (not @slow)".
 func (r *Runner) Tags(tagExpr string) *Runner {
 	var err error
-	r.tagExpr, err = tag.ParseExpr(tagExpr)
+	r.tagExpr, err = tag.Parse(tagExpr)
 	if err != nil {
 		r.topLevelT.Fatalf("error parsing tag expression %s: %v", tagExpr, err)
 	}
@@ -44,7 +45,7 @@ func (r *Runner) Tags(tagExpr string) *Runner {
 // any other tag expression that is applied with Tags() when running short tests.
 func (r *Runner) ShortTags(tagExpr string) *Runner {
 	var err error
-	r.shortTagExpr, err = tag.ParseExpr(tagExpr)
+	r.shortTagExpr, err = tag.Parse(tagExpr)
 	if err != nil {
 		r.topLevelT.Fatalf("error parsing tag expression %s: %v", tagExpr, err)
 	}

@@ -5,17 +5,31 @@ import messages "github.com/cucumber/messages/go/v21"
 type Tags map[string]bool
 
 func NewTags(tags ...string) Tags {
-	res := map[string]bool{}
-	for _, tag := range tags {
-		res[tag] = true
+	have := map[string]bool{}
+	var res []string
+	for _, t := range tags {
+		if !have[t] {
+			have[t] = true
+			res = append(res, t)
+		}
 	}
 	return res
 }
 
 func NewTagsFromPickleTags(pickleTags []*messages.PickleTag) Tags {
-	res := map[string]bool{}
-	for _, tag := range pickleTags {
-		res[tag.Name] = true
+	have := map[string]bool{}
+	var res []string
+	for _, t := range pickleTags {
+		if !have[t.Name] {
+			have[t.Name] = true
+			res = append(res, t.Name)
+		}
 	}
 	return res
+}
+
+type Tags []string
+
+func (t Tags) Match(expr tag.Evaluatable) bool {
+	return expr.Evaluate(t)
 }

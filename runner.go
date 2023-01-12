@@ -26,8 +26,8 @@ type Runner struct {
 	beforeStepHooks      []*stepDef
 	afterStepHooks       []*stepDef
 	suiteUsesRapid       bool
-	tagExpr              *tag.Expr
-	shortTagExpr         *tag.Expr
+	tagExpr              tag.Evaluatable
+	shortTagExpr         tag.Evaluatable
 }
 
 type suiteInjector struct {
