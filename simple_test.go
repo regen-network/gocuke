@@ -1,8 +1,9 @@
 package gocuke_test
 
 import (
-	"github.com/regen-network/gocuke"
 	"testing"
+
+	"github.com/regen-network/gocuke"
 )
 
 func TestSimple(t *testing.T) {
