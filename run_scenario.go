@@ -1,11 +1,13 @@
 package gocuke
 
 import (
-	"github.com/cucumber/common/messages/go/v17"
-	"github.com/regen-network/gocuke/internal/tag"
-	"pgregory.net/rapid"
 	"reflect"
 	"testing"
+
+	"github.com/cucumber/common/messages/go/v17"
+	"pgregory.net/rapid"
+
+	"github.com/regen-network/gocuke/internal/tag"
 )
 
 func (r *docRunner) runScenario(t *testing.T, pickle *messages.Pickle) {
@@ -29,8 +31,21 @@ func (r *docRunner) runScenario(t *testing.T, pickle *messages.Pickle) {
 	}
 
 	stepDefs := make([]*stepDef, len(pickle.Steps))
+	missingSteps := false
 	for i, step := range pickle.Steps {
-		stepDefs[i] = r.findStep(t, step)
+		step := r.findStep(t, step)
+		if step == nil {
+			missingSteps = true
+		}
+		stepDefs[i] = step
+	}
+
+	if missingSteps {
+		if *flagStrict {
+			t.FailNow()
+		} else {
+			t.SkipNow()
+		}
 	}
 
 	if t.Failed() {

@@ -1,8 +1,9 @@
 package gocuke
 
 import (
-	"github.com/cucumber/common/messages/go/v17"
 	"reflect"
+
+	"github.com/cucumber/common/messages/go/v17"
 )
 
 func (r *scenarioRunner) runHook(def *stepDef) {
@@ -25,6 +26,24 @@ func (r *scenarioRunner) runHook(def *stepDef) {
 
 func (r *scenarioRunner) runStep(step *messages.PickleStep, def *stepDef) {
 	r.t.Helper()
+
+	defer func() {
+		pending := false
+		if panicErr := recover(); panicErr != nil {
+			if panicErr == "PENDING" {
+				pending = true
+			} else {
+				panic(panicErr)
+			}
+		}
+		if pending {
+			if *flagStrict {
+				r.t.Error("PENDING")
+			} else {
+				r.t.Skip("PENDING")
+			}
+		}
+	}()
 
 	r.step = step
 
