@@ -3,7 +3,7 @@ package gocuke
 import (
 	"testing"
 
-	"github.com/cucumber/common/messages/go/v19"
+	messages "github.com/cucumber/messages/go/v21"
 	"gotest.tools/v3/assert"
 )
 

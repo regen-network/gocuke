@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"testing"
 
-	gherkin "github.com/cucumber/common/gherkin/go/v24"
+	gherkin "github.com/cucumber/gherkin/go/v26"
 	"gotest.tools/v3/assert"
 )
 

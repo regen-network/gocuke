@@ -5,7 +5,7 @@ import (
 	"reflect"
 
 	"github.com/cockroachdb/apd/v3"
-	"github.com/cucumber/common/messages/go/v19"
+	messages "github.com/cucumber/messages/go/v21"
 )
 
 // DataTable wraps a data table step argument

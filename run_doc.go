@@ -3,8 +3,8 @@ package gocuke
 import (
 	"testing"
 
-	"github.com/cucumber/common/gherkin/go/v24"
-	messages "github.com/cucumber/common/messages/go/v19"
+	gherkin "github.com/cucumber/gherkin/go/v26"
+	messages "github.com/cucumber/messages/go/v21"
 )
 
 type docRunner struct {
