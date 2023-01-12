@@ -5,9 +5,8 @@ import (
 	"testing"
 
 	"github.com/cucumber/common/messages/go/v19"
+	tag "github.com/cucumber/tag-expressions/go/v5"
 	"pgregory.net/rapid"
-
-	"github.com/regen-network/gocuke/internal/tag"
 )
 
 // Runner is a test runner.
