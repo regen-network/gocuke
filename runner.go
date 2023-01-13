@@ -4,7 +4,9 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/cockroachdb/apd/v3"
 	"github.com/cucumber/common/messages/go/v19"
+	cucumberexpressions "github.com/cucumber/cucumber-expressions/go/v16"
 	tag "github.com/cucumber/tag-expressions/go/v5"
 	"pgregory.net/rapid"
 )
@@ -27,6 +29,7 @@ type Runner struct {
 	suiteUsesRapid       bool
 	tagExpr              tag.Evaluatable
 	shortTagExpr         tag.Evaluatable
+	paramTypeRegistry    *cucumberexpressions.ParameterTypeRegistry
 }
 
 type suiteInjector struct {
@@ -82,7 +85,32 @@ func NewRunner(t *testing.T, suiteType interface{}) *Runner {
 				return step{runner.step}
 			},
 		},
-		suiteUsesRapid: false,
+		suiteUsesRapid:    false,
+		paramTypeRegistry: cucumberexpressions.NewParameterTypeRegistry(),
+	}
+
+	decParamType, err := cucumberexpressions.NewParameterType(
+		"decimal",
+		cucumberexpressions.FLOAT_REGEXPS,
+		"Decimal",
+		func(s ...*string) interface{} {
+			d, _, err := apd.NewFromString(*s[0])
+			if err != nil {
+				panic(err)
+			}
+			return d
+		},
+		false,
+		false,
+		false,
+	)
+	if err != nil {
+		t.Fatalf("error defining parameter type")
+	}
+
+	err = r.paramTypeRegistry.DefineParameterType(decParamType)
+	if err != nil {
+		t.Fatalf("error defining parameter type")
 	}
 
 	r.registerSuite(suiteType)

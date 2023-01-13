@@ -3,6 +3,8 @@ github.com/cockroachdb/apd/v3 v3.1.0/go.mod h1:6qgPBMXjATAdD/VefbRP9NoSLKjbB4LCo
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/cucumber/common/messages/go/v19 v19.1.2 h1:8/ZkW9rj3KQo/regmI8kcy48tk57m427Olb7Y0lXcN4=
 github.com/cucumber/common/messages/go/v19 v19.1.2/go.mod h1:0KLDvMVmmkEZcWUSKxFHSUSLS1gjujBbPN0p41IwwJ4=
+github.com/cucumber/cucumber-expressions/go/v16 v16.1.1 h1:5XvDHJYY+FvsPoJchF2+E2eNnPuBMGlAGnHnI5LLX78=
+github.com/cucumber/cucumber-expressions/go/v16 v16.1.1/go.mod h1:sqsZ8NO/wOp64ybaLjRZhq58j5TZQwAuuuklNYoSnRY=
 github.com/cucumber/gherkin/go/v26 v26.0.3 h1:ExcdadOazxzN11RYQZfaWcODMp7ZbRYLwqMbqWF8QEw=
 github.com/cucumber/gherkin/go/v26 v26.0.3/go.mod h1:Xf+SrSuFbivEDZvmHjTShord3zlEkqsj7QB4sxl1SuU=
 github.com/cucumber/messages/go/v21 v21.0.1 h1:wzA0LxwjlWQYZd32VTlAVDTkW6inOFmSM+RuOwHZiMI=

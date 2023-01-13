@@ -15,6 +15,7 @@ require (
 )
 
 require (
+	github.com/cucumber/cucumber-expressions/go/v16 v16.1.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gofrs/uuid v4.2.0+incompatible // indirect
 	github.com/kr/text v0.2.0 // indirect

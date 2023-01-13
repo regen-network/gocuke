@@ -2,17 +2,21 @@ package gocuke
 
 import (
 	"fmt"
-	"gotest.tools/v3/assert"
 	"reflect"
 	"regexp"
 	"runtime"
 	"testing"
+
+	cucumberexpressions "github.com/cucumber/cucumber-expressions/go/v16"
+	"gotest.tools/v3/assert"
 )
 
 type stepDef struct {
 	regex       *regexp.Regexp
+	expr        cucumberexpressions.Expression
 	theFunc     reflect.Value
 	specialArgs []*specialArg
+	paramTypes  []reflect.Type
 	funcLoc     string
 }
 
@@ -71,17 +75,26 @@ func (r *Runner) newStepDefOrHook(t *testing.T, exp *regexp.Regexp, f reflect.Va
 	rfunc := runtime.FuncForPC(funcPtr)
 	file, line := rfunc.FileLine(funcPtr)
 
+	var cukeExpr cucumberexpressions.Expression
+	if exp != nil {
+		cukeExpr = cucumberexpressions.NewRegularExpression(exp, r.paramTypeRegistry)
+	}
 	def := &stepDef{
 		regex:   exp,
+		expr:    cukeExpr,
 		theFunc: f,
 		funcLoc: fmt.Sprintf("%s (%s:%d)", rfunc.Name(), file, line),
 	}
 
-	for i := 0; i < typ.NumIn(); i++ {
+	numIn := typ.NumIn()
+	for i := 0; i < numIn; i++ {
 		typ := typ.In(i)
 		getter, ok := r.supportedSpecialArgs[typ]
 		if !ok {
 			// expect remaining args to be step arguments
+			for ; i < numIn; i++ {
+				def.paramTypes = append(def.paramTypes, typ)
+			}
 			break
 		}
 

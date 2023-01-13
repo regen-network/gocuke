@@ -37,12 +37,15 @@ func (r *scenarioRunner) runStep(step *messages.PickleStep, def *stepDef) {
 		defer r.runHook(hook)
 	}
 
-	matches := def.regex.FindSubmatch([]byte(step.Text))
-	if len(matches) == 0 {
-		r.t.Fatalf("internal error: no matches found when matching %s against %s", def.regex.String(), step.Text)
+	//matches := def.regex.FindSubmatch([]byte(step.Text))
+	//if len(matches) == 0 {
+	//	r.t.Fatalf("internal error: no matches found when matching %s against %s", def.regex.String(), step.Text)
+	//}
+	matches, err := def.expr.Match(step.Text, def.paramTypes...)
+	if err != nil {
+		r.t.Fatalf("internal error: no matches found when matching %s against %s", def.expr.Regexp().String(), step.Text)
 	}
 
-	matches = matches[1:]
 	numSpecialArgs := len(def.specialArgs)
 	expectedIn := len(matches) + numSpecialArgs
 	typ := def.theFunc.Type()
@@ -63,7 +66,8 @@ func (r *scenarioRunner) runStep(step *messages.PickleStep, def *stepDef) {
 	}
 
 	for i, match := range matches {
-		values[i+numSpecialArgs] = convertParamValue(r.t, string(match), typ.In(i+numSpecialArgs), def.funcLoc)
+		//values[i+numSpecialArgs] = convertParamValue(r.t, string(match), typ.In(i+numSpecialArgs), def.funcLoc)
+		values[i+numSpecialArgs] = reflect.ValueOf(match.GetValue())
 	}
 
 	// pickleArg goes last
