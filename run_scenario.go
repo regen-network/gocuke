@@ -50,7 +50,8 @@ func (r *docRunner) runScenario(t *testing.T, pickle *messages.Pickle) {
 	}
 
 	if useRapid {
-		rapid.Check(t, func(t *rapid.T) {
+		rapid.Check(t, func(rt *rapid.T) {
+			t := &rapidT{rt}
 			(&scenarioRunner{
 				docRunner: r,
 				t:         t,
@@ -103,9 +104,12 @@ func (r *scenarioRunner) runTestCase() {
 	}
 
 	for _, hook := range r.afterHooks {
-		if t, ok := r.t.(interface{ Cleanup(func()) }); ok {
+		switch t := r.t.(type) {
+		case *rapidT:
+			defer r.runHook(hook)
+		case interface{ Cleanup(func()) }:
 			t.Cleanup(func() { r.runHook(hook) })
-		} else {
+		default:
 			defer r.runHook(hook)
 		}
 	}
