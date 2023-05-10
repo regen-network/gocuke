@@ -3,6 +3,7 @@ package gocuke
 // TestingT is the common subset of testing methods exposed to test suite
 // instances and expected by common assertion and mocking libraries.
 type TestingT interface {
+	Cleanup(func())
 	Error(args ...interface{})
 	Errorf(format string, args ...interface{})
 	Fail()
