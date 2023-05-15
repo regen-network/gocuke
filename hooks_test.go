@@ -1,9 +1,10 @@
 package gocuke
 
 import (
+	"testing"
+
 	"gotest.tools/v3/assert"
 	"pgregory.net/rapid"
-	"testing"
 )
 
 func TestHooks(t *testing.T) {
@@ -18,7 +19,7 @@ func TestHooks(t *testing.T) {
 	assert.Assert(t, !shortRun)
 
 	if open != 0 {
-		t.Fatalf("expected resource to be closed")
+		t.Fatalf("expected 0 open resources, got: %d", open)
 	}
 
 	NewRunner(t, &hooksSuite{}).
@@ -30,7 +31,7 @@ func TestHooks(t *testing.T) {
 	assert.Assert(t, shortRun)
 
 	if open != 0 {
-		t.Fatalf("expected resource to be closed")
+		t.Fatalf("expected 0 open resources, got: %d", open)
 	}
 
 }
@@ -43,6 +44,7 @@ type hooksSuite struct {
 	TestingT
 	numOpenForScenario int64
 	numOpenForStep     int64
+	numOpenForCleanup  int64
 	scenario           Scenario
 }
 
@@ -57,6 +59,16 @@ func (s *hooksSuite) IOpenAnyResources(t *rapid.T) {
 	longRun = true
 	s.numOpenForScenario = rapid.Int64Range(1, 100).Draw(t, "numResources").(int64)
 	open += s.numOpenForScenario
+}
+
+func (s *hooksSuite) IOpenAResourceWithCleanup(step Step) {
+	assert.Equal(s, "I open a resource with cleanup", step.Text())
+	s.numOpenForScenario = 1
+	s.numOpenForCleanup = 1
+	open += s.numOpenForScenario + s.numOpenForCleanup
+	s.Cleanup(func() {
+		open -= s.numOpenForCleanup
+	})
 }
 
 func (s *hooksSuite) ItIsOpen(step Step) {
@@ -89,7 +101,7 @@ func (s *hooksSuite) BeforeStep() {
 
 func (s *hooksSuite) AfterStep() {
 	if s.numOpenForStep != 1 {
-		s.Fatalf("expected step resources to be 1 before step")
+		s.Fatalf("expected step resources to be 1 after step, got: %d", s.numOpenForStep)
 	}
 	s.numOpenForStep = 0
 }
