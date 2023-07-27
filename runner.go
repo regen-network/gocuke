@@ -67,8 +67,8 @@ func NewRunner(t *testing.T, suiteType interface{}) *Runner {
 			},
 			// *rapid.T
 			reflect.TypeOf(&rapid.T{}): func(runner *scenarioRunner) interface{} {
-				if t, ok := runner.t.(*rapid.T); ok {
-					return t
+				if t, ok := runner.t.(*rapidT); ok {
+					return t.T
 				}
 				runner.t.Fatalf("expected %T, but got %T", &rapid.T{}, runner.t)
 				return nil
