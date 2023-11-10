@@ -2,12 +2,13 @@ package gocuke
 
 import (
 	"fmt"
+	"math/big"
+	"testing"
+
 	"github.com/cockroachdb/apd/v3"
 	"github.com/google/go-cmp/cmp"
 	"gotest.tools/v3/assert"
-	"math/big"
 	"pgregory.net/rapid"
-	"testing"
 )
 
 func TestValues(t *testing.T) {
@@ -37,7 +38,7 @@ var bigIntComparer = cmp.Comparer(func(x, y *big.Int) bool {
 })
 
 func (s *valuesSuite) AnyInt64String(t *rapid.T) {
-	s.AnInt64(rapid.Int64().Draw(t, "orig").(int64))
+	s.AnInt64(rapid.Int64().AsAny().Draw(t, "orig").(int64))
 }
 
 func (s *valuesSuite) WhenIConvertItToAnInt64() {
@@ -45,23 +46,23 @@ func (s *valuesSuite) WhenIConvertItToAnInt64() {
 }
 
 var decGen = rapid.Custom(func(t *rapid.T) *apd.Decimal {
-	nBytes := rapid.IntRange(1, 16).Draw(t, "nBytes").(int)
+	nBytes := rapid.IntRange(1, 16).AsAny().Draw(t, "nBytes").(int)
 	bytes := make([]byte, nBytes)
 	for i := 0; i < nBytes; i++ {
-		bytes[i] = rapid.Byte().Draw(t, fmt.Sprintf("byte%d", i)).(byte)
+		bytes[i] = rapid.Byte().AsAny().Draw(t, fmt.Sprintf("byte%d", i)).(byte)
 	}
 	coeff := &apd.BigInt{}
 	coeff.SetBytes(bytes)
-	neg := rapid.Bool().Draw(t, "neg").(bool)
+	neg := rapid.Bool().AsAny().Draw(t, "neg").(bool)
 	if neg {
 		coeff = coeff.Neg(coeff)
 	}
-	exp := rapid.Int32Range(-5000, 5000).Draw(t, "exp").(int32)
+	exp := rapid.Int32Range(-5000, 5000).AsAny().Draw(t, "exp").(int32)
 	return apd.NewWithBigInt(coeff, exp)
 })
 
 func (s *valuesSuite) AnyDecimalString(t *rapid.T) {
-	s.ADecimal(decGen.Draw(t, "x").(*apd.Decimal))
+	s.ADecimal(decGen.AsAny().Draw(t, "x").(*apd.Decimal))
 }
 
 func (s *valuesSuite) WhenIConvertItToADecimal() {
@@ -69,14 +70,14 @@ func (s *valuesSuite) WhenIConvertItToADecimal() {
 }
 
 var bigIntGen = rapid.Custom(func(t *rapid.T) *big.Int {
-	nBytes := rapid.IntRange(1, 16).Draw(t, "nBytes").(int)
+	nBytes := rapid.IntRange(1, 16).AsAny().Draw(t, "nBytes").(int)
 	bytes := make([]byte, nBytes)
 	for i := 0; i < nBytes; i++ {
-		bytes[i] = rapid.Byte().Draw(t, fmt.Sprintf("byte%d", i)).(byte)
+		bytes[i] = rapid.Byte().AsAny().Draw(t, fmt.Sprintf("byte%d", i)).(byte)
 	}
 	x := &big.Int{}
 	x.SetBytes(bytes)
-	neg := rapid.Bool().Draw(t, "neg").(bool)
+	neg := rapid.Bool().AsAny().Draw(t, "neg").(bool)
 	if neg {
 		x = x.Neg(x)
 	}
@@ -84,7 +85,7 @@ var bigIntGen = rapid.Custom(func(t *rapid.T) *big.Int {
 })
 
 func (s *valuesSuite) AnyBigIntegerString(t *rapid.T) {
-	s.ABigInteger(bigIntGen.Draw(t, "x").(*big.Int))
+	s.ABigInteger(bigIntGen.AsAny().Draw(t, "x").(*big.Int))
 }
 
 func (s *valuesSuite) WhenIConvertItToABigInteger() {
