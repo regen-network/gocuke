@@ -2,7 +2,7 @@
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/regen-network/gocuke.svg)](https://pkg.go.dev/github.com/regen-network/gocuke)
 
-`gocuke` is a Gherkin-based BDD testing library for golang. 
+`gocuke` is a Gherkin-based BDD testing library for golang.
 
 ## Features
 
@@ -209,7 +209,7 @@ Scenario: any int64 value
 ```go
 type suite struct {
   TestingT
-  
+
   x, parsed   int64
   str    string
 }
@@ -231,3 +231,24 @@ func (s *suite) IGetBackTheOriginalValue() {
 ## Roadmap
 
 * [Cucumber `message` based reporting](https://cucumber.io/docs/cucumber/reporting/)
+
+
+## Contributing
+
+### pre-commit hooks
+
+- We have some steps as defined in [.pre-commit-config.yaml] (.pre-commit-config.yaml) that run before commit
+  - On mac, simply `brew install pre-commit` to install the library
+  - To install the hooks for this repo `pre-commit install && pre-commit install --hook-type commit-msg`
+  - There's a helper script to install the hooks locally [setup-hooks.sh](setup-hooks.sh)
+  - pre-commit config is held in [.pre-commit-config.yaml](.pre-commit-config.yaml)
+  - More docs: <https://pre-commit.com/>
+  - Standards Enforcement:
+    - Conventional Commits
+      - https://www.conventionalcommits.org/en/v1.0.0/
+      - prefix your commits with - fix:, feat:, BREAKING CHANGE:
+      - additionally- build:, chore:, ci:, docs:, style:, refactor:, perf:, test:
+    - misc file & convention linting
+    - golanglintci
+      - Runs various linting utilities
+      - https://github.com/golangci/golangci-lint
