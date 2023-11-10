@@ -57,7 +57,7 @@ func (s *hooksSuite) IOpenAResource(step Step) {
 
 func (s *hooksSuite) IOpenAnyResources(t *rapid.T) {
 	longRun = true
-	s.numOpenForScenario = rapid.Int64Range(1, 100).Draw(t, "numResources").(int64)
+	s.numOpenForScenario = rapid.Int64Range(1, 100).AsAny().Draw(t, "numResources").(int64)
 	open += s.numOpenForScenario
 }
 
