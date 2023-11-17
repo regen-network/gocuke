@@ -104,10 +104,9 @@ func lastChar(x string) byte {
 }
 
 func toFirstUpperIdentifier(str string) string {
-	runes := []rune(str)
 	var res []rune
 	isFirst := true
-	for _, r := range runes {
+	for _, r := range str {
 		if isFirst {
 			if !(unicode.IsLetter(r) || unicode.IsNumber(r)) {
 				continue

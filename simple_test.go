@@ -7,7 +7,7 @@ import (
 )
 
 func TestSimple(t *testing.T) {
-	gocuke.NewRunner(t, &simpleSuite{}).Path("features/simple.feature").Run()
+	gocuke.NewRunner(t, &simpleSuite{}).Path("_examples/simple/simple.feature").Run()
 }
 
 type simpleSuite struct {
@@ -31,7 +31,7 @@ func (s *simpleSuite) IHaveLeft(a int64) {
 
 // test if a struct that doesn't use a pointer and a global var
 func TestSimpleNonPointer(t *testing.T) {
-	gocuke.NewRunner(t, simpleSuiteNP{}).Path("features/simple.feature").Run()
+	gocuke.NewRunner(t, simpleSuiteNP{}).Path("_examples/simple/simple.feature").Run()
 }
 
 var globalCukes int64

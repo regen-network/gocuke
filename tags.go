@@ -19,7 +19,7 @@ func initGlobalTagExpr() tag.Evaluatable {
 			globalTagExpr, err = tag.Parse(*flagTags)
 			if err != nil {
 				if err != nil {
-					panic(fmt.Errorf("error parsing tag expression %q: %v\n", *flagTags, err))
+					panic(fmt.Errorf("error parsing tag expression %q: %v", *flagTags, err))
 				}
 			}
 		}

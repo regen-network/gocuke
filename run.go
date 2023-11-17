@@ -36,14 +36,8 @@ func (r *Runner) Run() {
 		}
 
 		for _, file := range files {
-			f, err := os.Open(file)
+			f, err := os.Open(file) //nolint:gosec,EXC0010
 			assert.NilError(r.topLevelT, err)
-			defer func() {
-				err := f.Close()
-				if err != nil {
-					panic(err)
-				}
-			}()
 
 			haveTests = true
 
@@ -58,6 +52,9 @@ func (r *Runner) Run() {
 
 				(newDocRunner(r, doc)).runDoc(t)
 			})
+			if err = f.Close(); err != nil {
+				panic(err)
+			}
 		}
 	}
 

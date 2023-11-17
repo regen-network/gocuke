@@ -69,9 +69,9 @@ func (r *scenarioRunner) runStep(step *messages.PickleStep, def *stepDef) {
 	// pickleArg goes last
 	if hasPickleArg {
 		i := expectedIn - 1
-		typ := typ.In(i)
+		pickleArgType := typ.In(i)
 		// only one of DataTable or DocString is valid
-		if typ == dataTableType {
+		if pickleArgType == dataTableType {
 			if step.Argument.DataTable == nil {
 				r.t.Fatalf("expected non-nil DataTable")
 			}
@@ -81,7 +81,7 @@ func (r *scenarioRunner) runStep(step *messages.PickleStep, def *stepDef) {
 				table: step.Argument.DataTable,
 			}
 			values[i] = reflect.ValueOf(dataTable)
-		} else if typ == docStringType {
+		} else if pickleArgType == docStringType {
 			if step.Argument.DocString == nil {
 				r.t.Fatalf("expected non-nil DocString")
 			}
@@ -92,7 +92,7 @@ func (r *scenarioRunner) runStep(step *messages.PickleStep, def *stepDef) {
 			}
 			values[i] = reflect.ValueOf(docString)
 		} else {
-			r.t.Fatalf("unexpected parameter type %v in function %s", typ, def.funcLoc)
+			r.t.Fatalf("unexpected parameter type %v in function %s", pickleArgType, def.funcLoc)
 		}
 	}
 
