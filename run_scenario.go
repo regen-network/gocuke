@@ -10,7 +10,7 @@ import (
 	"github.com/regen-network/gocuke/internal/tag"
 )
 
-func (r *docRunner) runScenario(t *testing.T, pickle *messages.Pickle) {
+func (r *docRunner) runScenario(t *testing.T, pickle *messages.Pickle, verbose bool) {
 	t.Helper()
 
 	tags := tag.NewTagsFromPickleTags(pickle.Tags)
@@ -57,6 +57,7 @@ func (r *docRunner) runScenario(t *testing.T, pickle *messages.Pickle) {
 				t:         t,
 				pickle:    pickle,
 				stepDefs:  stepDefs,
+				verbose:   verbose,
 			}).runTestCase()
 		})
 	} else {
@@ -65,6 +66,7 @@ func (r *docRunner) runScenario(t *testing.T, pickle *messages.Pickle) {
 			t:         t,
 			pickle:    pickle,
 			stepDefs:  stepDefs,
+			verbose:   verbose,
 		}).runTestCase()
 	}
 }
@@ -76,6 +78,7 @@ type scenarioRunner struct {
 	pickle   *messages.Pickle
 	stepDefs []*stepDef
 	step     *messages.PickleStep
+	verbose  bool
 }
 
 func (r *scenarioRunner) runTestCase() {
