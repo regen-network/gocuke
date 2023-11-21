@@ -1,26 +1,28 @@
-package gocuke
+package datatable
 
 import (
-	"gotest.tools/v3/assert"
 	"testing"
+
+	"github.com/regen-network/gocuke"
+	"gotest.tools/v3/assert"
 )
 
 func TestDataTable(t *testing.T) {
-	NewRunner(t, &dataTableSuite{}).
-		Path("features/datatable.feature").Run()
+	gocuke.NewRunner(t, &dataTableSuite{}).
+		Path("datatable.feature").Run()
 }
 
 type dataTableSuite struct {
-	TestingT
-	datatable DataTable
+	gocuke.TestingT
+	datatable gocuke.DataTable
 	total     int64
 }
 
-func (d *dataTableSuite) Before(t TestingT) {
+func (d *dataTableSuite) Before(t gocuke.TestingT) {
 	d.TestingT = t
 }
 
-func (s *dataTableSuite) ThisDataTable(a DataTable) {
+func (s *dataTableSuite) ThisDataTable(a gocuke.DataTable) {
 	s.datatable = a
 }
 

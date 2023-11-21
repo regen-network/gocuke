@@ -2,11 +2,12 @@ package gocuke
 
 import (
 	"fmt"
-	"gotest.tools/v3/assert"
 	"reflect"
 	"regexp"
 	"runtime"
 	"testing"
+
+	"gotest.tools/v3/assert"
 )
 
 type stepDef struct {
@@ -78,15 +79,15 @@ func (r *Runner) newStepDefOrHook(t *testing.T, exp *regexp.Regexp, f reflect.Va
 	}
 
 	for i := 0; i < typ.NumIn(); i++ {
-		typ := typ.In(i)
-		getter, ok := r.supportedSpecialArgs[typ]
+		stepTyp := typ.In(i)
+		getter, ok := r.supportedSpecialArgs[stepTyp]
 		if !ok {
 			// expect remaining args to be step arguments
 			break
 		}
 
 		def.specialArgs = append(def.specialArgs, &specialArg{
-			typ:      typ,
+			typ:      stepTyp,
 			getValue: getter,
 		})
 	}
