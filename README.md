@@ -190,7 +190,7 @@ tests. `Runner.ShortTags` method can be used to select a set of tags to
 * `Before()`, `After()`, `BeforeStep()`, or and `AfterStep()` can be used to register custom hooks.
 * `Tags` and `ShortTags` can be used with tag expressions as described above.
 * `NonParallel()` disables parallel tests.
-* `--verbose` or `-v` in your go-tests will emit the current test step definition to stdout while your tests are running, this is useful for testing
+* `--verbose` or `-v` with `go test` will emit the current test step definition to stdout while your tests are running, this is useful for debugging failing tests.
 
 ### Property-based testing using Rapid
 
