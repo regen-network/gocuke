@@ -96,5 +96,9 @@ func (r *scenarioRunner) runStep(step *messages.PickleStep, def *stepDef) {
 		}
 	}
 
+	if r.verbose {
+		r.t.Logf("Step: %s", step.Text)
+	}
+
 	def.theFunc.Call(values)
 }

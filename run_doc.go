@@ -31,7 +31,7 @@ func (r *docRunner) runDoc(t *testing.T) {
 				t.Parallel()
 			}
 
-			r.runScenario(t, pickle)
+			r.runScenario(t, pickle, testing.Verbose())
 		})
 	}
 }
