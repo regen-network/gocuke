@@ -185,7 +185,7 @@ tests. `Runner.ShortTags` method can be used to select a set of tags to
 
 `Runner` has the following methods for setting custom options
 
-* `Path()` sets custom paths. The default is `features/*.feature`.
+* `Path()` sets custom paths, and accepts `**` glob patterns making use of the [doublestar](https://github.com/bmatcuk/doublestar/tree/master) library. The default is `features/**/*.feature`
 * `Step()` can be used to add custom steps with special regular expressions.
 * `Before()`, `After()`, `BeforeStep()`, or and `AfterStep()` can be used to register custom hooks.
 * `Tags` and `ShortTags` can be used with tag expressions as described above.
