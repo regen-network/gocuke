@@ -3,6 +3,7 @@ module github.com/regen-network/gocuke
 go 1.21
 
 require (
+	github.com/bmatcuk/doublestar/v4 v4.6.1
 	github.com/cockroachdb/apd/v3 v3.2.1
 	github.com/cucumber/common/messages/go/v19 v19.1.2
 	github.com/cucumber/gherkin/go/v26 v26.2.0

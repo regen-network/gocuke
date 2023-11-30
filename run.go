@@ -2,11 +2,11 @@ package gocuke
 
 import (
 	"os"
-	"path/filepath"
 	"reflect"
 	"strings"
 	"testing"
 
+	"github.com/bmatcuk/doublestar/v4"
 	gherkin "github.com/cucumber/gherkin/go/v26"
 	"gotest.tools/v3/assert"
 )
@@ -17,7 +17,7 @@ func (r *Runner) Run() {
 
 	paths := r.paths
 	if len(paths) == 0 {
-		paths = []string{"features/*.feature"}
+		paths = []string{"features/**/*.feature"}
 	}
 
 	haveTests := false
@@ -29,7 +29,7 @@ func (r *Runner) Run() {
 		// not doing this allows mis-spellings in exact paths to be skipped silently
 		if strings.Contains(path, "*") {
 			var err error
-			files, err = filepath.Glob(path)
+			files, err = doublestar.FilepathGlob(path)
 			assert.NilError(r.topLevelT, err)
 		} else {
 			files = []string{path}
