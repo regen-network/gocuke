@@ -4,13 +4,14 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/regen-network/gocuke"
 	"github.com/stretchr/testify/require"
+
+	"github.com/regen-network/gocuke"
 )
 
 func TestCustomSteps(t *testing.T) {
 	gocuke.NewRunner(t, &customStepsSuite{}).
-		Path("_examples/simple/simple.feature").
+		Path("examples/simple/simple.feature").
 		Step(`I have (\d+) cukes`, (*customStepsSuite).A).
 		Step(regexp.MustCompile(`I eat (\d+)`), (*customStepsSuite).B).
 		Step(`I have (\d+) left`, (*customStepsSuite).C).

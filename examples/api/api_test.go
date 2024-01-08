@@ -6,9 +6,10 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/regen-network/gocuke"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/regen-network/gocuke"
 )
 
 type suite struct {
@@ -19,7 +20,12 @@ type suite struct {
 
 func TestApi(t *testing.T) {
 	scope := &suite{TestingT: t, resp: httptest.NewRecorder()}
-	gocuke.NewRunner(t, scope).
+	run := gocuke.NewRunner(t, scope)
+	run.Before(func() {
+		scope.resp = httptest.NewRecorder()
+	})
+
+	run.
 		Step(`^I send "(GET|POST|PUT|DELETE)" request to "([^"]*)"$`, scope.ISendRequestTo).
 		Step(`^the response code should be (\d+)$`, scope.TheResponseCodeShouldBe).
 		Step(`^the response should match json:$`, scope.TheResponseShouldMatchJson).
