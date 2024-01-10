@@ -112,10 +112,13 @@ func (r *Runner) registerSuite(suiteType interface{}) *Runner {
 			continue
 		}
 
-		if getter, ok := r.supportedSpecialArgs[field.Type]; ok {
-			r.suiteInjectors = append(r.suiteInjectors, &suiteInjector{getValue: getter, field: field})
-			if field.Type == rapidTType {
-				r.suiteUsesRapid = true
+		for specialArgType, getter := range r.supportedSpecialArgs {
+			if field.Type.AssignableTo(specialArgType) {
+				r.suiteInjectors = append(r.suiteInjectors, &suiteInjector{getValue: getter, field: field})
+				if field.Type == rapidTType {
+					r.suiteUsesRapid = true
+				}
+				break
 			}
 		}
 	}
