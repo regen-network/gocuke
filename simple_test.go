@@ -53,3 +53,51 @@ func (s simpleSuiteNP) IHaveLeft(a int64) {
 		s.Fatalf("expected %d cukes, have %d", a, globalCukes)
 	}
 }
+
+// test a struct using a different interface compatible with gocuke.TestingT
+func TestSimpleCompat(t *testing.T) {
+	gocuke.NewRunner(t, &simpleSuiteCompat{}).Path("examples/simple/simple.feature").Run()
+}
+
+type TestingTCompat interface {
+	Cleanup(func())
+	Error(args ...interface{})
+	Errorf(format string, args ...interface{})
+	Fail()
+	FailNow()
+	Failed() bool
+	Fatal(args ...interface{})
+	Fatalf(format string, args ...interface{})
+	Log(args ...interface{})
+	Logf(format string, args ...interface{})
+	Skip(args ...interface{})
+	SkipNow()
+	Skipf(format string, args ...interface{})
+	Helper()
+
+	// Not included in gocuke.TestingT
+	Name() string
+}
+
+type simpleSuiteCompat struct {
+	TestingTCompat
+	cukes int64
+}
+
+func (s *simpleSuiteCompat) IHaveCukes(a int64) {
+	// These calls to s.LogF fail if s.TestingTCompat is nil
+	s.Logf("I have %d cukes", a)
+	s.cukes = a
+}
+
+func (s *simpleSuiteCompat) IEat(a int64) {
+	s.Logf("I eat %d", a)
+	s.cukes -= a
+}
+
+func (s *simpleSuiteCompat) IHaveLeft(a int64) {
+	s.Logf("I have %d left?", a)
+	if a != s.cukes {
+		s.Fatalf("expected %d cukes, have %d", a, s.cukes)
+	}
+}
