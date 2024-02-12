@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 
-	tag "github.com/cucumber/tag-expressions/go/v5"
+	tag "github.com/cucumber/tag-expressions/go/v6"
 )
 
 var flagTags = flag.String("gocuke.tags", "",

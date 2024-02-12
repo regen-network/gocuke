@@ -3,7 +3,7 @@ package gocuke
 import (
 	"reflect"
 
-	messages "github.com/cucumber/messages/go/v21"
+	messages "github.com/cucumber/messages/go/v22"
 )
 
 func (r *scenarioRunner) runHook(def *stepDef) {

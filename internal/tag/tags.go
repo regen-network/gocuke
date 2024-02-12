@@ -1,8 +1,8 @@
 package tag
 
 import (
-	messages "github.com/cucumber/messages/go/v21"
-	tag "github.com/cucumber/tag-expressions/go/v5"
+	messages "github.com/cucumber/messages/go/v22"
+	tag "github.com/cucumber/tag-expressions/go/v6"
 )
 
 func NewTags(tags ...string) Tags {

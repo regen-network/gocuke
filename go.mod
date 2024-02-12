@@ -5,10 +5,9 @@ go 1.21
 require (
 	github.com/bmatcuk/doublestar/v4 v4.6.1
 	github.com/cockroachdb/apd/v3 v3.2.1
-	github.com/cucumber/common/messages/go/v19 v19.1.2
-	github.com/cucumber/gherkin/go/v26 v26.2.0
-	github.com/cucumber/messages/go/v21 v21.0.1
-	github.com/cucumber/tag-expressions/go/v5 v5.0.6
+	github.com/cucumber/gherkin/go/v27 v27.0.0
+	github.com/cucumber/messages/go/v22 v22.0.0
+	github.com/cucumber/tag-expressions/go/v6 v6.1.0
 	github.com/google/go-cmp v0.6.0
 	github.com/stretchr/testify v1.8.4
 	gotest.tools/v3 v3.5.1

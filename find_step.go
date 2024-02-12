@@ -3,7 +3,7 @@ package gocuke
 import (
 	"testing"
 
-	messages "github.com/cucumber/messages/go/v21"
+	messages "github.com/cucumber/messages/go/v22"
 )
 
 func (r *Runner) findStep(t *testing.T, step *messages.PickleStep) *stepDef {

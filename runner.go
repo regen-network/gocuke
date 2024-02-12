@@ -4,8 +4,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/cucumber/common/messages/go/v19"
-	tag "github.com/cucumber/tag-expressions/go/v5"
+	messages "github.com/cucumber/messages/go/v22"
+	tag "github.com/cucumber/tag-expressions/go/v6"
 	"pgregory.net/rapid"
 )
 
