@@ -77,6 +77,10 @@ type suite struct {
 When you run the tests, they should fail and suggest that you add these
 step definitions:
 ```go
+func (s *suite) IHaveCukes(a int64) {
+    panic("PENDING")
+}
+
 func (s *suite) IEat(a int64) {
     panic("PENDING")
 }
@@ -85,14 +89,10 @@ func (s *suite) IHaveLeft(a int64) {
     panic("PENDING")
 }
 
-func (s *suite) IHaveCukes(a int64) {
-    panic("PENDING")
-}
-
 Steps can be manually registered with the runner for customization using this code:
-  Step(`^I\s+have\s+(-?\d+)\s+cukes$`, (*simpleSuite).IHaveCukes).
-  Step(`^I\s+eat\s+(-?\d+)$`, (*simpleSuite).IEat).
-  Step(`^I\s+have\s+(-?\d+)\s+left$`, (*simpleSuite).IHaveLeft)
+  Step(`^I\s+have\s+(-?\d+)\s+cukes$`, (*suite).IHaveCukes).
+  Step(`^I\s+eat\s+(-?\d+)$`, (*suite).IEat).
+  Step(`^I\s+have\s+(-?\d+)\s+left$`, (*suite).IHaveLeft)
 ```
 
 Copy these definitions into `simple_test.go`.
