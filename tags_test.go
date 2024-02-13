@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	tagexpressions "github.com/cucumber/tag-expressions/go/v5"
+	tagexpressions "github.com/cucumber/tag-expressions/go/v6"
 	"gotest.tools/v3/assert"
 
 	"github.com/regen-network/gocuke/internal/tag"

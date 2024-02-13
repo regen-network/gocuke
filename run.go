@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/bmatcuk/doublestar/v4"
-	gherkin "github.com/cucumber/gherkin/go/v26"
+	gherkin "github.com/cucumber/gherkin/go/v27"
 	"gotest.tools/v3/assert"
 )
 
