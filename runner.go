@@ -17,7 +17,8 @@ type Runner struct {
 	paths                []string
 	parallel             bool
 	stepDefs             []*stepDef
-	suggestions          map[string]methodSig
+	haveSuggestion       map[string]bool
+	suggestions          []methodSig
 	supportedSpecialArgs map[reflect.Type]specialArgGetter
 	suiteInjectors       []*suiteInjector
 	beforeHooks          []*stepDef
@@ -56,10 +57,10 @@ func NewRunner(t *testing.T, suiteType interface{}) *Runner {
 	initGlobalTagExpr()
 
 	r := &Runner{
-		topLevelT:   t,
-		incr:        &messages.Incrementing{},
-		parallel:    false,
-		suggestions: map[string]methodSig{},
+		topLevelT:      t,
+		incr:           &messages.Incrementing{},
+		parallel:       false,
+		haveSuggestion: map[string]bool{},
 		supportedSpecialArgs: map[reflect.Type]specialArgGetter{
 			// TestingT
 			reflect.TypeOf((*TestingT)(nil)).Elem(): func(runner *scenarioRunner) interface{} {

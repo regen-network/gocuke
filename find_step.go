@@ -22,7 +22,10 @@ func (r *Runner) findStep(t *testing.T, step *messages.PickleStep) *stepDef {
 		return r.addStepDef(t, sig.regex, method.Func)
 	}
 
-	r.suggestions[sig.name] = sig
+	if !r.haveSuggestion[sig.name] {
+		r.haveSuggestion[sig.name] = true
+		r.suggestions = append(r.suggestions, sig)
+	}
 	t.Errorf("can't find step definition for: %s", step.Text)
 
 	return nil
