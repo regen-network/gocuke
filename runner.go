@@ -59,7 +59,7 @@ func NewRunner(t *testing.T, suiteType interface{}) *Runner {
 	r := &Runner{
 		topLevelT:      t,
 		incr:           &messages.Incrementing{},
-		parallel:       false,
+		parallel:       true,
 		haveSuggestion: map[string]bool{},
 		supportedSpecialArgs: map[reflect.Type]specialArgGetter{
 			// TestingT

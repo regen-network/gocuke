@@ -31,7 +31,11 @@ func (s *simpleSuite) IHaveLeft(a int64) {
 
 // test if a struct that doesn't use a pointer and a global var
 func TestSimpleNonPointer(t *testing.T) {
-	gocuke.NewRunner(t, simpleSuiteNP{}).Path("examples/simple/simple.feature").Run()
+	gocuke.
+		NewRunner(t, simpleSuiteNP{}).
+		Path("examples/simple/simple.feature").
+		NonParallel().
+		Run()
 }
 
 var globalCukes int64

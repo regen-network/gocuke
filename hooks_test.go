@@ -14,6 +14,7 @@ func TestHooks(t *testing.T) {
 	NewRunner(t, &hooksSuite{}).
 		Path("features/hooks.feature").
 		Tags("@long").
+		NonParallel().
 		Run()
 	assert.Assert(t, longRun)
 	assert.Assert(t, !shortRun)
@@ -25,6 +26,7 @@ func TestHooks(t *testing.T) {
 	NewRunner(t, &hooksSuite{}).
 		Path("features/hooks.feature").
 		ShortTags("not @long").
+		NonParallel().
 		Run()
 
 	assert.Assert(t, longRun)
@@ -33,12 +35,13 @@ func TestHooks(t *testing.T) {
 	if open != 0 {
 		t.Fatalf("expected 0 open resources, got: %d", open)
 	}
-
 }
 
-var longRun = false
-var shortRun = false
-var open int64 = 0
+var (
+	longRun        = false
+	shortRun       = false
+	open     int64 = 0
+)
 
 type hooksSuite struct {
 	TestingT
