@@ -20,7 +20,9 @@ type suite struct {
 
 func TestApi(t *testing.T) {
 	scope := &suite{TestingT: t, resp: httptest.NewRecorder()}
-	run := gocuke.NewRunner(t, scope)
+	run := gocuke.
+		NewRunner(t, scope).
+		NonParallel()
 	run.Before(func() {
 		scope.resp = httptest.NewRecorder()
 	})
