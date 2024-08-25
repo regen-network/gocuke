@@ -54,7 +54,9 @@ func (r *Runner) Step(step interface{}, definition interface{}) *Runner {
 
 func (r *Runner) addStepDef(t *testing.T, exp *regexp.Regexp, definition reflect.Value) *stepDef {
 	t.Helper()
+	defer r.stepDefsMutex.Unlock()
 
+	r.stepDefsMutex.Lock()
 	def := r.newStepDefOrHook(t, exp, definition)
 	r.stepDefs = append(r.stepDefs, def)
 	return def

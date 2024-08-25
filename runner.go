@@ -2,6 +2,7 @@ package gocuke
 
 import (
 	"reflect"
+	"sync"
 	"testing"
 
 	messages "github.com/cucumber/messages/go/v22"
@@ -17,6 +18,7 @@ type Runner struct {
 	paths                []string
 	parallel             bool
 	stepDefs             []*stepDef
+	stepDefsMutex 	  	 *sync.RWMutex
 	haveSuggestion       map[string]bool
 	suggestions          []methodSig
 	supportedSpecialArgs map[reflect.Type]specialArgGetter
@@ -84,6 +86,7 @@ func NewRunner(t *testing.T, suiteType interface{}) *Runner {
 			},
 		},
 		suiteUsesRapid: false,
+		stepDefsMutex: &sync.RWMutex{},
 	}
 
 	r.registerSuite(suiteType)
