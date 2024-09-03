@@ -91,9 +91,14 @@ type HeaderTable struct {
 }
 
 // Get returns the cell at the provided row offset (skipping the header row)
-// and column name (as indicated in the header).
+// and column name (as indicated in the header). If the column name is not
+// found, nil is returned.
 func (h *HeaderTable) Get(row int, col string) *Cell {
-	return h.DataTable.Cell(row+1, h.headers[col])
+	if v, ok := h.headers[col]; !ok {
+		return nil
+	} else {
+		return h.DataTable.Cell(row+1, v)
+	}
 }
 
 // NumRows returns the number of rows in the table (excluding the header row).
